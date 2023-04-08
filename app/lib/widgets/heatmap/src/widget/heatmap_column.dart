@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import './heatmap_container.dart';
-import '../util/date_util.dart';
-import '../util/datasets_util.dart';
 import '../data/heatmap_color_mode.dart';
+import '../util/datasets_util.dart';
+import '../util/date_util.dart';
 
 class HeatMapColumn extends StatelessWidget {
   /// The List widgets of [HeatMapContainer].
@@ -95,6 +96,9 @@ class HeatMapColumn extends StatelessWidget {
         dayContainers = List.generate(
           numDays,
           (i) => HeatMapContainer(
+            number: datasets![DateTime(startDate.year, startDate.month,
+                    startDate.day + i - (startDate.weekday % 7))] ??
+                0,
             date: DateUtil.changeDay(startDate, i),
             backgroundColor: defaultColor,
             size: size,
@@ -108,17 +112,14 @@ class HeatMapColumn extends StatelessWidget {
             // we have to color the matched HeatMapContainer.
             //
             // If datasets is null or doesn't contains the equal DateTime value, send null.
-            selectedColor: datasets?.keys.contains(DateTime(
-                        startDate.year,
-                        startDate.month,
-                        startDate.day - startDate.weekday % 7 + i)) ??
-                    false
+            selectedColor: datasets.keys.contains(DateTime(startDate.year,
+                    startDate.month, startDate.day - startDate.weekday % 7 + i))
                 // If colorMode is ColorMode.opacity,
                 ? colorMode == ColorMode.opacity
                     // Color the container with first value of colorsets
                     // and set opacity value to current day's datasets key
                     // devided by maxValue which is the maximum value of the month.
-                    ? colorsets?.values.first.withOpacity((datasets?[DateTime(
+                    ? colorsets?.values.first.withOpacity((datasets[DateTime(
                                 startDate.year,
                                 startDate.month,
                                 startDate.day + i - (startDate.weekday % 7))] ??
@@ -130,7 +131,7 @@ class HeatMapColumn extends StatelessWidget {
                     // Using DatasetsUtil.getColor()
                     : DatasetsUtil.getColor(
                         colorsets,
-                        datasets?[DateTime(startDate.year, startDate.month,
+                        datasets[DateTime(startDate.year, startDate.month,
                             startDate.day + i - (startDate.weekday % 7))])
                 : null,
           ),

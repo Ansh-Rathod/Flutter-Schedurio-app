@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/screens/home/home_screen.dart';
 
+import 'config.dart';
 import 'screens/walk_through/walk_through_screen.dart';
 import 'services/hive_cache.dart';
-import 'widgets/heatmap/src/data/heatmap_color_mode.dart';
-import 'widgets/heatmap/src/heatmap.dart';
 
 void main() async {
   await LocalCache.init();
@@ -23,19 +23,21 @@ class SchedurioApp extends StatelessWidget {
       darkTheme: MacosThemeData.dark(),
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: const WalkThroughScreen(),
+      home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
+          ? const AppLayout()
+          : const WalkThroughScreen(),
     );
   }
 }
 
-class WidgetGallery extends StatefulWidget {
-  const WidgetGallery({super.key});
+class AppLayout extends StatefulWidget {
+  const AppLayout({super.key});
 
   @override
-  State<WidgetGallery> createState() => _WidgetGalleryState();
+  State<AppLayout> createState() => _AppLayoutState();
 }
 
-class _WidgetGalleryState extends State<WidgetGallery> {
+class _AppLayoutState extends State<AppLayout> {
   double ratingValue = 0;
   double sliderValue = 0;
   bool value = false;
@@ -44,34 +46,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
 
   late final searchFieldController = TextEditingController();
 
-  final List<Widget> pages = [
-    MacosScaffold(
-      children: [
-        ContentArea(builder: (context, scrollController) {
-          return Container(
-            color: MacosTheme.of(context).dividerColor.withOpacity(0.1),
-            padding: const EdgeInsets.all(20),
-            child: HeatMap(
-              size: 14,
-              fontSize: 12,
-              startDate: DateTime(2022, 5, 11),
-              textColor: Colors.white,
-              defaultColor: Colors.grey.shade300,
-              scrollable: true,
-              showColorTip: false,
-              datasets: {DateTime(2023, 2, 12): 3},
-              colorMode: ColorMode.opacity,
-              showText: false,
-              colorsets: const {
-                1: Colors.blue,
-              },
-              onClick: (value) async {},
-            ),
-          );
-        }),
-      ],
-    )
-  ];
+  final List<Widget> pages = [const HomeScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -109,10 +84,11 @@ class _WidgetGalleryState extends State<WidgetGallery> {
         ),
       ],
       child: MacosWindow(
+        backgroundColor: const Color.fromARGB(255, 34, 32, 34),
         titleBar: const TitleBar(
           height: 35,
           title: Text(
-            "Ansh rathod's Twitter",
+            "Schedurio",
             style: TextStyle(fontSize: 14),
           ),
         ),
@@ -241,10 +217,16 @@ class _WidgetGalleryState extends State<WidgetGallery> {
               ],
             );
           },
-          bottom: const MacosListTile(
-            leading: MacosIcon(CupertinoIcons.profile_circled),
-            title: Text('Ansh Rathod'),
-            subtitle: Text('@anshrathodfr'),
+          bottom: MacosListTile(
+            leading: CircleAvatar(
+              radius: 16,
+              backgroundImage: NetworkImage(LocalCache.currentUser
+                  .get(AppConfig.hiveKeys.profilePicture)),
+            ),
+            title: Text(
+                LocalCache.currentUser.get(AppConfig.hiveKeys.displayName)),
+            subtitle:
+                Text(LocalCache.currentUser.get(AppConfig.hiveKeys.username)),
           ),
         ),
         endSidebar: Sidebar(

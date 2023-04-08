@@ -66,13 +66,6 @@ class _WalkThroughScreenState extends State<WalkThroughScreen> {
           final walkThrough =
               LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough);
 
-          //   return MacosScaffold(
-          //     children: [
-          //       ContentArea(
-          //           builder: (context, sc) =>
-          //     ],
-          //   );
-          // }
           if (walkThrough == null) {
             return AboutWalkThrough(
               onNext: () => setState(() {}),

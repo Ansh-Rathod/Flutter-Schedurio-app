@@ -17,6 +17,7 @@ class HeatMapPage extends StatelessWidget {
 
   /// The number of days between [startDate] and [endDate].
   final int _dateDifferent;
+  final bool reverse;
 
   /// The Date value of start day of heatmap.
   ///
@@ -25,6 +26,7 @@ class HeatMapPage extends StatelessWidget {
   /// Default value is 1 year before the [endDate].
   /// And if [endDate] is null, then set 1 year before the [DateTime.now]
   final DateTime startDate;
+  final ScrollController controller;
 
   /// The Date value of end day of heatmap.
   ///
@@ -81,6 +83,8 @@ class HeatMapPage extends StatelessWidget {
     required this.colorMode,
     required this.startDate,
     required this.endDate,
+    required this.reverse,
+    required this.controller,
     this.size,
     this.fontSize,
     this.datasets,
@@ -142,7 +146,8 @@ class HeatMapPage extends StatelessWidget {
 
   Widget scrollableHeatMap(Widget child) {
     return SingleChildScrollView(
-      reverse: true,
+      reverse: reverse,
+      controller: controller,
       scrollDirection: Axis.horizontal,
       child: child,
     );

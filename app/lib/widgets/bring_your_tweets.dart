@@ -2,6 +2,8 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:schedurio/config.dart';
+import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/widgets/blurry_container.dart';
 
 import '../animations/delayed_animation.dart';
@@ -85,9 +87,11 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
                   ],
                 ),
                 onPressed: () async {
-                  for (var i = 0; i < 4; i++) {
+                  for (var i = 0; i < 5; i++) {
                     final tweets = await GetTweets.fromServer(i);
                   }
+                  await LocalCache.currentUser
+                      .put(AppConfig.hiveKeys.walkThrough, 'done');
                   widget.onNext();
                 },
               ),

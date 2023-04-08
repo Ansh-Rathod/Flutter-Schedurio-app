@@ -21,7 +21,7 @@ class TweetModel {
       scrapedAt: json['scraped_at'] != null
           ? DateTime.parse(json['scraped_at'] as String)
           : DateTime.now(),
-      postedAt: DateTime.parse(json['created_at'] as String),
+      postedAt: DateTime.parse(json['posted_at'] as String),
       publicMetrics: PublicMetrics.fromJson(
         json['public_metrics'] as Map<String, dynamic>,
       ),
@@ -30,9 +30,10 @@ class TweetModel {
               .map((e) => Media.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      polls: json['polls'] != null
-          ? Poll.fromJson((json['polls'] as List<Map<String, dynamic>>).first)
-          : null,
+      polls:
+          json['polls'] != null && (json['polls'] as List<dynamic>).isNotEmpty
+              ? Poll.fromJson((json['polls'] as List<dynamic>).first)
+              : null,
     );
   }
 

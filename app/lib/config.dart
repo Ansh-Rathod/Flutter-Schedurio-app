@@ -24,7 +24,7 @@ class HiveKeys {
   final String email = 'email';
 
   /// NOTE:only use in currentUser box
-  final String profilePicture = 'email';
+  final String profilePicture = 'profilePicture';
 
   /// NOTE:only use in currentUser box
   final String walkThrough = 'walkThrough';

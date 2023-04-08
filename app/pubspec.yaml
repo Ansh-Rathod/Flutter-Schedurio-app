@@ -43,6 +43,8 @@ dependencies:
   http: ^0.13.5
   url_launcher: ^6.1.10
   dio: ^5.1.1
+  flutter_bloc: ^8.1.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

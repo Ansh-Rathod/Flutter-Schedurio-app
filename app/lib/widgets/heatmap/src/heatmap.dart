@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import './data/heatmap_color_mode.dart';
@@ -12,6 +13,8 @@ class HeatMap extends StatefulWidget {
   /// Default value is 1 year before of the [endDate].
   /// And if [endDate] is null, then set 1 year before of the [DateTime.now].
   final DateTime? startDate;
+
+  final bool reverse;
 
   /// The Date value of end day of heatmap.
   ///
@@ -58,6 +61,7 @@ class HeatMap extends StatefulWidget {
 
   /// The double value of every block's borderRadius.
   final double? borderRadius;
+  final ScrollController scrollController;
 
   /// Show day text in every blocks if the value is true.
   ///
@@ -89,18 +93,20 @@ class HeatMap extends StatefulWidget {
 
   const HeatMap({
     Key? key,
-    required this.colorsets,
-    this.colorMode = ColorMode.opacity,
     this.startDate,
+    required this.reverse,
     this.endDate,
+    required this.scrollController,
+    this.datasets,
+    this.defaultColor,
     this.textColor,
     this.size = 20,
     this.fontSize,
+    required this.colorsets,
+    this.colorMode = ColorMode.opacity,
     this.onClick,
     this.margin,
     this.borderRadius,
-    this.datasets,
-    this.defaultColor,
     this.showText = false,
     this.showColorTip = true,
     this.scrollable = false,
@@ -119,6 +125,8 @@ class _HeatMap extends State<HeatMap> {
   @override
   Widget build(BuildContext context) {
     return HeatMapPage(
+      reverse: widget.reverse,
+      controller: widget.scrollController,
       endDate: widget.endDate ?? DateTime.now(),
       startDate: widget.startDate ??
           DateUtil.oneYearBefore(widget.endDate ?? DateTime.now()),

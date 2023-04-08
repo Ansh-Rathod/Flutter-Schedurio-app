@@ -7,12 +7,12 @@ class GetTweets {
   static Dio dio = Dio();
   static Future<List<TweetModel>> fromServer(int page) async {
     final response = await dio.get('http://localhost:8080/tweets?page=$page');
-
+    print(response.data['tweets']);
     for (var tweet in response.data['tweets']) {
       await LocalCache.tweets.put(tweet['id'], tweet);
     }
 
-    return response.data['tweets']
+    return (response.data['tweets'] as List)
         .map((tweet) => TweetModel.fromJson(tweet))
         .toList();
   }
