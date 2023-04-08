@@ -10,13 +10,33 @@ class AppConfig {
 
 /// hive keys class
 class HiveKeys {
-  /// current user
-  final String currentUser = 'currentUser';
+  // current user box
+  /// NOTE:only use in currentUser box
+  final String username = 'username';
+
+  /// NOTE:only use in currentUser box
+  final String displayName = 'displayName';
+
+  /// NOTE:only use in currentUser box
+  final String email = 'email';
+
+  /// NOTE:only use in currentUser box
+  final String walkThrough = 'walkThrough';
+
+  // twitterApiConfig box
+  /// NOTE:only use in twitterAPi box
+  final String apiKey = 'apiKey';
+
+  /// NOTE:only use in twitterAPi box
+  final String apiSecretKey = 'apiSecretKey';
+
+  /// NOTE:only use in twitterAPi box
+  final String redirectURI = 'redirectURI';
 }
 
 /// Hive box names
 class HiveBoxNames {
   /// current user box
-  final String users = 'users';
-  final String subscriptions = 'subscriptions';
+  final String currentUser = 'currentUser';
+  final String twitterApiConfig = 'twitterApiConfig';
 }

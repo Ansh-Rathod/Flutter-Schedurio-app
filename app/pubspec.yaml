@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   macos_ui: ^1.12.2
+  blobs: ^2.0.0
+  animated_text_kit: ^4.2.2
   hive_flutter: ^1.1.0
   schedurio_utils:
     path: ../packages/schedurio_utils

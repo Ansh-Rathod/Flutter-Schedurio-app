@@ -2,15 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import 'screens/walk_through/walk_through_screen.dart';
+import 'services/hive_cache.dart';
 import 'widgets/heatmap/src/data/heatmap_color_mode.dart';
 import 'widgets/heatmap/src/heatmap.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  await LocalCache.init();
+  runApp(const SchedurioApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SchedurioApp extends StatelessWidget {
+  const SchedurioApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
       darkTheme: MacosThemeData.dark(),
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: const WidgetGallery(),
+      home: const WalkThroughScreen(),
     );
   }
 }

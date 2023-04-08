@@ -8,8 +8,8 @@ import '../config.dart';
 /// localcache is a class that implements HiveContract and is used to access the hive box methods
 class LocalCache {
   /// users box
-  static late HiveContract<dynamic> users;
-  static late HiveContract<List<String>> subscriptions;
+  static late HiveContract currentUser;
+  static late HiveContract twitterApi;
 
   ///  checks if Localcache is initialized or not
   static bool isInitialized = false;
@@ -17,12 +17,12 @@ class LocalCache {
   /// init hive box
   static Future<void> init() async {
     await Hive.initFlutter();
-    users = HiveStorageImplementation(
-      await Hive.openBox(AppConfig.hiveBoxNames.users),
+    currentUser = HiveStorageImplementation(
+      await Hive.openBox(AppConfig.hiveBoxNames.currentUser),
     );
 
-    subscriptions = HiveStorageImplementation(
-      await Hive.openBox(AppConfig.hiveBoxNames.subscriptions),
+    twitterApi = HiveStorageImplementation(
+      await Hive.openBox(AppConfig.hiveBoxNames.twitterApiConfig),
     );
 
     isInitialized = true;
