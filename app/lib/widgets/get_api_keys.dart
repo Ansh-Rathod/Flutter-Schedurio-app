@@ -20,8 +20,10 @@ class GetApiKeys extends StatefulWidget {
 class _GetApiKeysState extends State<GetApiKeys> {
   final TextEditingController apiKeyController = TextEditingController();
   final TextEditingController apiSecretController = TextEditingController();
+  final TextEditingController redirectURIController = TextEditingController();
   String apiKeyError = '';
   String apiSecretError = '';
+  String redirectURIError = '';
   @override
   Widget build(BuildContext context) {
     return BlurryContainer(
@@ -106,6 +108,30 @@ class _GetApiKeysState extends State<GetApiKeys> {
                   ),
                 const SizedBox(height: 20.0),
                 const Text(
+                  "Redirect URL",
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                CupertinoTheme(
+                  data: const CupertinoThemeData(brightness: Brightness.light),
+                  child: CupertinoTextField(
+                    controller: redirectURIController,
+                    placeholder: 'http://schedurio.com/twitter/callback',
+                  ),
+                ),
+                if (redirectURIError != '')
+                  Text(
+                    redirectURIError,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.red,
+                    ),
+                  ),
+                const SizedBox(height: 20.0),
+                const Text(
                   "Need help? with twitter developer account?",
                   style: TextStyle(
                     fontSize: 14.0,
@@ -143,6 +169,10 @@ class _GetApiKeysState extends State<GetApiKeys> {
                             LocalCache.twitterApi.put(
                                 AppConfig.hiveKeys.apiSecretKey,
                                 apiSecretController.text),
+                            LocalCache.twitterApi.put(
+                              AppConfig.hiveKeys.redirectURI,
+                              redirectURIController.text,
+                            ),
                             LocalCache.currentUser.put(
                                 AppConfig.hiveKeys.walkThrough, 'authenticate')
                           ]);
