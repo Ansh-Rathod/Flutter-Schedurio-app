@@ -1,3 +1,4 @@
 import 'package:supabase/supabase.dart';
 
-final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
+final supabase = SupabaseClient('https://ymqribzzaqwkxsfervlb.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltcXJpYnp6YXF3a3hzZmVydmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODA4NjA3NjksImV4cCI6MTk5NjQzNjc2OX0.PqDSfGGW42riZfbThw0YFiZhNJS-PEIy0-WSTsEuRHY');

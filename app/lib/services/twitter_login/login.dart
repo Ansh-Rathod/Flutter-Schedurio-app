@@ -23,8 +23,9 @@ enum TwitterLoginStatus {
 
 ///
 class TwitterLogin {
-  final String apiKey = '';
-  final String apiSecretKey = '';
+  final String apiKey = 'E6LGuEE3S3TPFGxZ76FoVBMgE';
+  final String apiSecretKey =
+      'B4ORZMSmIkhnzorvtmzaJGK4iwghcI5i371kYAV0Y8J8mT3FDm';
   final String redirectURI = 'http://localhost:3000/api/auth/callback/twitter';
 
   /// Logs the user
@@ -72,6 +73,7 @@ class TwitterLogin {
       apiSecretKey,
       queries,
     );
+    // http: //localhost:3000/api/auth/callback/twitter?oauth_token=S4BlMwAAAAABgmYjAAABh2ChkiI&oauth_verifier=W8aE57hkPiQECvVColuKWETBuEvANEsa
     print(token.userId);
     if ((token.authToken?.isEmpty ?? true) ||
         (token.authTokenSecret?.isEmpty ?? true)) {

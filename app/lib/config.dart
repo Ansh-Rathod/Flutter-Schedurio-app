@@ -15,20 +15,33 @@ class HiveKeys {
   final String username = 'username';
 
   /// NOTE:only use in currentUser box
+  final String userId = 'userId';
+
+  /// NOTE:only use in currentUser box
   final String displayName = 'displayName';
 
   /// NOTE:only use in currentUser box
   final String email = 'email';
 
   /// NOTE:only use in currentUser box
+  final String profilePicture = 'email';
+
+  /// NOTE:only use in currentUser box
   final String walkThrough = 'walkThrough';
 
+  // tweets box
   // twitterApiConfig box
   /// NOTE:only use in twitterAPi box
   final String apiKey = 'apiKey';
 
   /// NOTE:only use in twitterAPi box
   final String apiSecretKey = 'apiSecretKey';
+
+  /// NOTE:only use in twitterAPi box
+  final String authToken = 'AuthToken';
+
+  /// NOTE:only use in twitterAPi box
+  final String authSecretToken = 'AuthSecretToken';
 
   /// NOTE:only use in twitterAPi box
   final String redirectURI = 'redirectURI';
@@ -39,4 +52,5 @@ class HiveBoxNames {
   /// current user box
   final String currentUser = 'currentUser';
   final String twitterApiConfig = 'twitterApiConfig';
+  final String tweets = 'tweets';
 }

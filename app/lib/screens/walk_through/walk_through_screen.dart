@@ -5,7 +5,9 @@ import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/widgets/authentication.dart';
 
 import '../../widgets/about_walk_through.dart';
+import '../../widgets/bring_your_tweets.dart';
 import '../../widgets/get_api_keys.dart';
+import '../../widgets/get_auth_result.dart';
 
 class WalkThroughScreen extends StatefulWidget {
   const WalkThroughScreen({super.key});
@@ -81,6 +83,14 @@ class _WalkThroughScreenState extends State<WalkThroughScreen> {
             );
           } else if (walkThrough == 'authenticate') {
             return Authenticate(
+              onNext: () => setState(() {}),
+            );
+          } else if (walkThrough == 'get_auth_result') {
+            return GetAuthResult(
+              onNext: () => setState(() {}),
+            );
+          } else if (walkThrough == 'tweets') {
+            return GetTweetsWidget(
               onNext: () => setState(() {}),
             );
           }

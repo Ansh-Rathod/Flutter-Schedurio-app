@@ -10,6 +10,7 @@ class LocalCache {
   /// users box
   static late HiveContract currentUser;
   static late HiveContract twitterApi;
+  static late HiveContract tweets;
 
   ///  checks if Localcache is initialized or not
   static bool isInitialized = false;
@@ -23,6 +24,9 @@ class LocalCache {
 
     twitterApi = HiveStorageImplementation(
       await Hive.openBox(AppConfig.hiveBoxNames.twitterApiConfig),
+    );
+    tweets = HiveStorageImplementation(
+      await Hive.openBox(AppConfig.hiveBoxNames.tweets),
     );
 
     isInitialized = true;

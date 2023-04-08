@@ -2,26 +2,23 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:macos_ui/macos_ui.dart';
-import 'package:schedurio/services/twitter_login/login.dart';
+import 'package:schedurio/widgets/blurry_container.dart';
 
 import '../animations/delayed_animation.dart';
-import '../config.dart';
-import '../services/hive_cache.dart';
-import 'blurry_container.dart';
+import '../apis/get_tweets.dart';
 
-class Authenticate extends StatefulWidget {
+class GetTweetsWidget extends StatefulWidget {
   final Function onNext;
-  const Authenticate({
+  const GetTweetsWidget({
     Key? key,
     required this.onNext,
   }) : super(key: key);
 
   @override
-  State<Authenticate> createState() => _AuthenticateState();
+  State<GetTweetsWidget> createState() => _GetTweetsWidgetState();
 }
 
-class _AuthenticateState extends State<Authenticate> {
+class _GetTweetsWidgetState extends State<GetTweetsWidget> {
   bool showButton = false;
   @override
   Widget build(BuildContext context) {
@@ -32,7 +29,7 @@ class _AuthenticateState extends State<Authenticate> {
           AnimatedTextKit(
             animatedTexts: [
               FadeAnimatedText(
-                'Nice!',
+                'Hurray! 🎉',
                 textStyle: const TextStyle(
                   fontSize: 32.0,
                   color: Colors.black,
@@ -40,7 +37,7 @@ class _AuthenticateState extends State<Authenticate> {
                 ),
               ),
               FadeAnimatedText(
-                'Let\'s Log you in!',
+                'Let\'s bring your old tweets!',
                 fadeInEnd: 0.8,
                 fadeOutBegin: 0.9,
                 textStyle: const TextStyle(
@@ -74,7 +71,7 @@ class _AuthenticateState extends State<Authenticate> {
                   mainAxisSize: MainAxisSize.min,
                   children: const [
                     Text(
-                      "Login to Twitter",
+                      "Get my old tweets",
                       style: TextStyle(color: Colors.white),
                     ),
                     SizedBox(
@@ -88,36 +85,10 @@ class _AuthenticateState extends State<Authenticate> {
                   ],
                 ),
                 onPressed: () async {
-                  showMacosAlertDialog(
-                    barrierDismissible: true,
-                    context: context,
-                    builder: (_) => MacosAlertDialog(
-                      appIcon: const FlutterLogo(
-                        size: 56,
-                      ),
-                      title: Text(
-                        'Launching your default browser',
-                        style: MacosTheme.of(context).typography.headline,
-                      ),
-                      message: Text(
-                        'Please login to your Twitter account and copy the PIN code from the browser and paste it in the next screen.',
-                        textAlign: TextAlign.center,
-                        style: MacosTheme.of(context).typography.headline,
-                      ),
-                      primaryButton: PushButton(
-                        buttonSize: ButtonSize.large,
-                        child: const Text('Open Browser'),
-                        onPressed: () async {
-                          await TwitterLogin().login();
-                          await LocalCache.currentUser.put(
-                              AppConfig.hiveKeys.walkThrough,
-                              'get_auth_result');
-                          widget.onNext.call();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ),
-                  );
+                  for (var i = 0; i < 4; i++) {
+                    final tweets = await GetTweets.fromServer(i);
+                  }
+                  widget.onNext();
                 },
               ),
             ),

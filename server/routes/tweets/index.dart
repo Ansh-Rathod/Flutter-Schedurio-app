@@ -5,13 +5,15 @@ import 'package:server/supabase.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final page = context.request.uri.queryParameters['page'] ?? '0';
+
   final rows = await supabase
       .from('tweets')
       .select('*')
-      .limit(10)
-      .order('posted_at', ascending: true);
+      .limit(100)
+      .range(int.parse(page) * 100, int.parse(page) * 100 + 100)
+      .order('posted_at', ascending: false);
 
   return Response.json(
-    body: rows.data,
+    body: {'tweets': rows, 'page': int.parse(page), 'results': rows.length},
   );
 }

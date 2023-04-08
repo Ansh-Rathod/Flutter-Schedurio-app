@@ -17,7 +17,7 @@ class TweetModel {
     return TweetModel(
       id: json['id'] as String,
       authorId: json['author_id'] as String,
-      content: json['text'] as String,
+      content: json['content'] as String,
       scrapedAt: json['scraped_at'] != null
           ? DateTime.parse(json['scraped_at'] as String)
           : DateTime.now(),
