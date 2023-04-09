@@ -1,20 +1,7 @@
-import 'package:dio/dio.dart';
-import 'package:schedurio_utils/schedurio_utils.dart';
+import '../../schedurio_utils.dart';
 
-class GetTweets {
-  static Dio dio = Dio();
-
-  List<TweetModel> convertResponse(dynamic data) {
-    // final headers = {
-    //   'Content-Type': 'application/json',
-    //   'Authorization':
-    //       'Bearer AAAAAAAAAAAAAAAAAAAAACNmggEAAAAAFRU6DxkolQw52kT0bp5tGQPLfP0%3D4NTdXlWJ8zIU87U0p9q9OhKIUL5ybSQve4cFbo8ZOeXK2ICFlU',
-    // };
-    // final response = await dio.get(
-    //   'https://api.twitter.com/2/users/$userId/tweets?exclude=replies,retweets&max_results=100&media.fields=alt_text,duration_ms,height,media_key,non_public_metrics,organic_metrics,preview_image_url,promoted_metrics,public_metrics,type,url,variants,width&tweet.fields=author_id,created_at,public_metrics,text,attachments&expansions=attachments.media_keys,attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status',
-    //   options: Options(headers: headers),
-    // );
-
+class ConvertTwitterResponse {
+  static List<TweetModel> toTweetModel(dynamic data) {
     final tweets = data['data'] as List<Map<String, dynamic>>;
     final media = (data['includes'] as Map).containsKey('media')
         ? (data['includes'] as Map)['media'] as List<Map<String, dynamic>>

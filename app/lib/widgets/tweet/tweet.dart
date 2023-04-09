@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/apis/get_tweets.dart';
 import 'package:schedurio/helpers.dart';
@@ -157,12 +158,34 @@ class _TweetWidgetState extends State<TweetWidget> {
                       color: Colors.blue,
                     )),
               ),
-              MacosIconButton(
-                  icon: const MacosIcon(CupertinoIcons.share),
-                  onPressed: () {
-                    launchUrlString(
-                        'https://twitter.com/intent/tweet?text=${widget.tweet.content}');
-                  })
+              Row(
+                children: [
+                  MacosTooltip(
+                    message: 'Copy full text',
+                    child: MacosIconButton(
+                        icon: const MacosIcon(Icons.copy),
+                        onPressed: () async {
+                          await Clipboard.setData(ClipboardData(text: content));
+                        }),
+                  ),
+                  MacosTooltip(
+                    message: 'Copy Tweet Link',
+                    child: MacosIconButton(
+                        icon: const MacosIcon(CupertinoIcons.link),
+                        onPressed: () async {
+                          await Clipboard.setData(ClipboardData(
+                              text:
+                                  'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/${widget.tweet.id}'));
+                        }),
+                  ),
+                  MacosTooltip(
+                    message: 'Add to favorites',
+                    child: MacosIconButton(
+                        icon: const MacosIcon(CupertinoIcons.star),
+                        onPressed: () {}),
+                  )
+                ],
+              )
             ],
           ),
         ],

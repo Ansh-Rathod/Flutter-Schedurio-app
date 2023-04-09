@@ -27,13 +27,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     }
     genrateNoOfTweet(lastTweetYear);
     emit(state.copyWith(
+      longestStreak: countLongestStreak(),
       years: years,
       tweets:
           LocalCache.tweets.values.map((e) => TweetModel.fromJson(e)).toList()
             ..sort((a, b) => b.postedAt.compareTo(a.postedAt)),
       data: dataSet(datasets),
       streak: countStreaks(),
-      longestStreak: countLongestStreak(),
     ));
   }
 
@@ -126,9 +126,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         .toList()
       ..sort();
 
-    if (datasets.isEmpty) return 0;
-
-    if (DateTime.now().difference(datasets.last).inDays > 1) {
+    if (datasets.isEmpty) {
       return 0;
     }
 
