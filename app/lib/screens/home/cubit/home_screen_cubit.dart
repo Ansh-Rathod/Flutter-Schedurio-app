@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:schedurio_utils/schedurio_utils.dart';
 
 import '../../../services/hive_cache.dart';
 
@@ -27,28 +28,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     genrateNoOfTweet(lastTweetYear);
     emit(state.copyWith(
       years: years,
+      tweets:
+          LocalCache.tweets.values.map((e) => TweetModel.fromJson(e)).toList()
+            ..sort((a, b) => b.postedAt.compareTo(a.postedAt)),
       data: dataSet(datasets),
       streak: countStreaks(),
       longestStreak: countLongestStreak(),
     ));
-  }
-
-  Map<DateTime, int> dataSet(datasets) {
-    Map<DateTime, int> map = {};
-
-    for (var data in datasets) {
-      List<DateTime> tweetsOnDay = datasets
-          .where((tweetTime) =>
-              tweetTime.day == data.day &&
-              tweetTime.month == data.month &&
-              tweetTime.year == data.year)
-          .toList();
-
-      int tweetCount = tweetsOnDay.length;
-      map.addEntries(
-          [MapEntry(DateTime(data.year, data.month, data.day), tweetCount)]);
-    }
-    return map;
   }
 
   void changeDate(int year) {
@@ -76,7 +62,45 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     }
   }
 
-  genrateNoOfTweet(int year) {
+  void openModel(DateTime value) {
+    final datasets = LocalCache.tweets.values
+        .map((e) => {'id': e['id'], 'time': DateTime.parse(e['posted_at'])})
+        .toList();
+    var ids = [];
+    for (var element in datasets) {
+      if (element['time'].day == value.day &&
+          element['time'].month == value.month &&
+          element['time'].year == value.year) {
+        ids.add(element['id']);
+      }
+    }
+
+    emit(state.copyWith(
+        selectedDate: value,
+        tweets: ids
+            .map((e) => TweetModel.fromJson(LocalCache.tweets.get(e)))
+            .toList()));
+  }
+
+  Map<DateTime, int> dataSet(datasets) {
+    Map<DateTime, int> map = {};
+
+    for (var data in datasets) {
+      List<DateTime> tweetsOnDay = datasets
+          .where((tweetTime) =>
+              tweetTime.day == data.day &&
+              tweetTime.month == data.month &&
+              tweetTime.year == data.year)
+          .toList();
+
+      int tweetCount = tweetsOnDay.length;
+      map.addEntries(
+          [MapEntry(DateTime(data.year, data.month, data.day), tweetCount)]);
+    }
+    return map;
+  }
+
+  void genrateNoOfTweet(int year) {
     final datasets = LocalCache.tweets.values
         .map((e) => DateTime.parse(e['posted_at']))
         .toList()

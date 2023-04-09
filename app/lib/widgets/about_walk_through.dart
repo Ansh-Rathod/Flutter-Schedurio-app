@@ -114,8 +114,9 @@ class _AboutWalkThroughState extends State<AboutWalkThrough> {
                   ],
                 ),
                 onPressed: () async {
-                  await LocalCache.currentUser
-                      .put(AppConfig.hiveKeys.walkThrough, 'api_keys');
+                  // await LocalCache.currentUser
+                  //     .put(AppConfig.hiveKeys.walkThrough, 'done');
+
                   widget.onNext.call();
                 },
               ),

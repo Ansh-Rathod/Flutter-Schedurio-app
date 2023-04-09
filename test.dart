@@ -1,11 +1,6 @@
 void main() {
-  var year = 2009;
-
-  var years = [year];
-  while (year != 2023) {
-    year = year + 1;
-    years.add(year);
-  }
-
-  print(years);
+  RegExp exp = RegExp(r'https:\/\/t.co\/\S+');
+  final urls = exp.allMatches(
+      "https://t.co/gpqlaIBonW \nthis is text\nhttps://t.co/vv8AHGoYFi https://t.co/YCrFkhPCLS");
+  print(urls.map((e) => e.group(0)).toList());
 }

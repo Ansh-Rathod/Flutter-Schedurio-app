@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/animations/delayed_animation.dart';
 import 'package:schedurio/config.dart';
+import 'package:schedurio/main.dart';
 import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/widgets/authentication.dart';
 
@@ -68,7 +70,10 @@ class _WalkThroughScreenState extends State<WalkThroughScreen> {
 
           if (walkThrough == null) {
             return AboutWalkThrough(
-              onNext: () => setState(() {}),
+              onNext: () {
+                Navigator.pushReplacement(
+                    context, createRoute(const AppLayout()));
+              },
             );
           } else if (walkThrough == 'api_keys') {
             return GetApiKeys(

@@ -23,11 +23,11 @@ class TweetModel {
           : DateTime.now(),
       postedAt: DateTime.parse(json['posted_at'] as String),
       publicMetrics: PublicMetrics.fromJson(
-        json['public_metrics'] as Map<String, dynamic>,
+        json['public_metrics'] as dynamic,
       ),
       media: json['media'] != null
           ? (json['media'] as List<dynamic>)
-              .map((e) => Media.fromJson(e as Map<String, dynamic>))
+              .map((e) => Media.fromJson(e as dynamic))
               .toList()
           : null,
       polls:
@@ -37,7 +37,7 @@ class TweetModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'id': id,
       'author_id': authorId,
@@ -73,18 +73,18 @@ class Poll {
     required this.votingStatus,
     required this.options,
   });
-  factory Poll.fromJson(Map<String, dynamic> json) {
+  factory Poll.fromJson(dynamic json) {
     return Poll(
       id: json['id'] as String,
       durationMinutes: json['duration_minutes'] as int,
       endDatetime: DateTime.parse(json['end_datetime'] as String),
       votingStatus: json['voting_status'] as String,
       options: (json['options'] as List<dynamic>)
-          .map((e) => PollOptions.fromJson(e as Map<String, dynamic>))
+          .map((e) => PollOptions.fromJson(e as dynamic))
           .toList(),
     );
   }
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'id': id,
       'duration_minutes': durationMinutes,
@@ -104,14 +104,14 @@ class PollOptions {
     required this.position,
     required this.votes,
   });
-  factory PollOptions.fromJson(Map<String, dynamic> json) {
+  factory PollOptions.fromJson(dynamic json) {
     return PollOptions(
       label: json['label'] as String,
       position: json['position'] as int,
       votes: json['votes'] as int,
     );
   }
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'label': label,
       'position': position,
@@ -132,7 +132,7 @@ class Media {
     this.views,
   });
 
-  factory Media.fromJson(Map<String, dynamic> json) {
+  factory Media.fromJson(dynamic json) {
     return Media(
       type: json['type'] as String,
       key: json['media_key'] as String,
@@ -145,13 +145,13 @@ class Media {
       url: (json['url'] ?? json['preview_image_url']) as String,
       variants: json['variants'] != null
           ? (json['variants'] as List<dynamic>)
-              .map((e) => Varients.fromJson(e as Map<String, dynamic>))
+              .map((e) => Varients.fromJson(e as dynamic))
               .toList()
           : null,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'media_key': key,
       'type': type,
@@ -183,14 +183,14 @@ class Varients {
   final String url;
   final int? bitRate;
   final String contentType;
-  factory Varients.fromJson(Map<String, dynamic> json) {
+  factory Varients.fromJson(dynamic json) {
     return Varients(
       url: json['url'] as String,
       bitRate: json['bit_rate'] != null ? json['bit_rate'] as int : null,
       contentType: json['content_type'] as String,
     );
   }
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'url': url,
       'bit_rate': bitRate,
@@ -208,7 +208,7 @@ class PublicMetrics {
     required this.impressionCount,
   });
 
-  factory PublicMetrics.fromJson(Map<String, dynamic> json) {
+  factory PublicMetrics.fromJson(dynamic json) {
     return PublicMetrics(
       retweetCount: json['retweet_count'] as int,
       replyCount: json['reply_count'] as int,
@@ -217,7 +217,7 @@ class PublicMetrics {
       impressionCount: json['impression_count'] as int,
     );
   }
-  Map<String, dynamic> toJson() {
+  dynamic toJson() {
     return {
       'retweet_count': retweetCount,
       'reply_count': replyCount,
