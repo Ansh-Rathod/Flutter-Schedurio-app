@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/screens/home/home_screen.dart';
+import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 
 import 'config.dart';
 import 'screens/walk_through/walk_through_screen.dart';
@@ -46,7 +47,10 @@ class _AppLayoutState extends State<AppLayout> {
 
   late final searchFieldController = TextEditingController();
 
-  final List<Widget> pages = [const HomeScreen()];
+  final List<Widget> pages = [
+    const HomeScreen(),
+    const PostingScheduleWidget()
+  ];
 
   @override
   Widget build(BuildContext context) {

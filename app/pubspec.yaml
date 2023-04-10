@@ -34,6 +34,7 @@ dependencies:
   blobs: ^2.0.0
   animated_text_kit: ^4.2.2
   hive_flutter: ^1.1.0
+  supabase: ^1.6.3
   html: ^0.15.2
   schedurio_utils:
     path: ../packages/schedurio_utils

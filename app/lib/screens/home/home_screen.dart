@@ -95,8 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     MacosPulldownMenuItem(
                                       title: const Text('Share'),
-                                      onTap: () => debugPrint(
-                                          "Opening Save As dialog..."),
+                                      onTap: () {
+                                        print(LocalCache.twitterApi.values);
+                                      },
                                     ),
                                     const MacosPulldownMenuDivider(),
                                     MacosPulldownMenuItem(
