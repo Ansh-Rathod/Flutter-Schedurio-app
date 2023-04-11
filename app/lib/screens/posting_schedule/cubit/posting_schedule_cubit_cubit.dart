@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/posting_schedule.dart';
+import '../../../services/hive_cache.dart';
 
 part 'posting_schedule_cubit_state.dart';
 
@@ -61,5 +62,15 @@ class PostingScheduleCubit extends Cubit<PostingScheduleState> {
       item.randomizeTimes();
     }
     emit(state.copyWith(schedule: state.schedule));
+  }
+
+  void reset() {
+    emit(PostingScheduleState.initial());
+  }
+
+  void save() async {
+    for (var item in state.schedule) {
+      await LocalCache.schedule.put(item.day, item.toJson()['times']);
+    }
   }
 }

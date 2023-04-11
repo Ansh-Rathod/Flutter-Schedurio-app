@@ -36,6 +36,7 @@ dependencies:
   hive_flutter: ^1.1.0
   supabase: ^1.6.3
   html: ^0.15.2
+  desktop_drop: ^0.4.1
   schedurio_utils:
     path: ../packages/schedurio_utils
 
@@ -45,6 +46,7 @@ dependencies:
   http: ^0.13.5
   url_launcher: ^6.1.10
   dio: ^5.1.1
+  file_picker: ^5.2.7
   flutter_bloc: ^8.1.2
   intl: ^0.18.0
   extended_image: ^7.0.2

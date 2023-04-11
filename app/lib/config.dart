@@ -53,4 +53,5 @@ class HiveBoxNames {
   final String currentUser = 'currentUser';
   final String twitterApiConfig = 'twitterApiConfig';
   final String tweets = 'tweets';
+  final String schedule = 'schedule';
 }

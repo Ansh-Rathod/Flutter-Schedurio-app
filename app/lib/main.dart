@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/screens/create_tweet/create_tweet.dart';
 import 'package:schedurio/screens/home/home_screen.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 
@@ -49,6 +50,7 @@ class _AppLayoutState extends State<AppLayout> {
 
   final List<Widget> pages = [
     const HomeScreen(),
+    const CreateTweet(),
     const PostingScheduleWidget()
   ];
 
