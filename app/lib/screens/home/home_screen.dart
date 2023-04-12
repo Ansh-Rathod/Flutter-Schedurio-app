@@ -20,11 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final dataKey = GlobalKey();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeScreenCubit()..init(),
@@ -285,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       state.selectedDate == null
                           ? "All Tweets"
-                          : "${state.tweets.length} Tweets on ${state.selectedDate!.toWeekDay()}",
+                          : "${state.tweets.length} Tweets on ${state.selectedDate!.formatedString()}",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

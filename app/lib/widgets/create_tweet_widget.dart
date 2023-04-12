@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:path/path.dart' as path;
 
 import '../config.dart';
 import '../services/hive_cache.dart';
@@ -16,6 +19,8 @@ class CreateTweetWidget extends StatefulWidget {
   final Function(int value) onRemove;
   final Function() onAdd;
   final List<dynamic> tweets;
+  final List<dynamic> media;
+  final Function(List<dynamic> list) onMediaChange;
   final dynamic tweet;
   const CreateTweetWidget({
     Key? key,
@@ -24,6 +29,8 @@ class CreateTweetWidget extends StatefulWidget {
     required this.onRemove,
     required this.onAdd,
     required this.tweets,
+    required this.media,
+    required this.onMediaChange,
     required this.tweet,
   }) : super(key: key);
 
@@ -33,33 +40,71 @@ class CreateTweetWidget extends StatefulWidget {
 
 class _CreateTweetWidgetState extends State<CreateTweetWidget> {
   bool isDragging = false;
+  void onFilesPick(List<String> paths) {
+    if (widget.media.length + paths.length > 4) {
+      showAlert(context);
+    } else if ((widget.media.map((e) => e['path']).toList() + paths)
+            .where((element) =>
+                element.substring(element.lastIndexOf('.') + 1) == 'mp4')
+            .length >
+        1) {
+      showAlert(context);
+    } else {
+      if (widget.media.isEmpty) {
+        widget.onMediaChange(paths
+            .map((e) => {
+                  'path': e,
+                  'name': path.basename(e),
+                  'extension': e.substring(e.lastIndexOf('.') + 1),
+                  'type': e.substring(e.lastIndexOf('.') + 1) == 'mp4'
+                      ? 'video'
+                      : e.substring(e.lastIndexOf('.') + 1) == 'gif'
+                          ? 'gif'
+                          : 'image'
+                })
+            .toList());
+      } else {
+        setState(() {
+          final list = widget.media +
+              paths
+                  .map((e) => {
+                        'path': e,
+                        'name': path.basename(e),
+                        'extension': e.substring(e.lastIndexOf('.') + 1),
+                        'type': e.substring(e.lastIndexOf('.') + 1) == 'mp4'
+                            ? 'video'
+                            : e.substring(e.lastIndexOf('.') + 1) == 'gif'
+                                ? 'gif'
+                                : 'image'
+                      })
+                  .toList();
+
+          List<Map<String, dynamic>> distinctList = [];
+
+          for (var item in list) {
+            bool isDuplicate = false;
+            for (var distinctItem in distinctList) {
+              if (item["name"] == distinctItem["name"]) {
+                isDuplicate = true;
+                break;
+              }
+            }
+            if (!isDuplicate) {
+              distinctList.add(item);
+            }
+          }
+          widget.onMediaChange(distinctList);
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return DropTarget(
       enable: true,
       onDragDone: (detail) {
-        print(detail.files.map((e) => e.name).toList());
-
-        if (detail.files.length > 4) {
-          showMacosAlertDialog(
-              context: context,
-              builder: (_) => MacosAlertDialog(
-                    appIcon: const FlutterLogo(size: 55),
-                    title: const Text(
-                      "Oops!",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    message: const Text(
-                        "Sorry, you can only upload a maximum of 4 images/gifs and one video in a single tweet."),
-                    primaryButton: PushButton(
-                      buttonSize: ButtonSize.large,
-                      child: const Text("Ok"),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ));
-        }
+        onFilesPick(detail.files.map((e) => e.path).toList());
       },
       onDragEntered: (detail) {
         setState(() {
@@ -175,6 +220,102 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                     const SizedBox(
                       height: 10,
                     ),
+                    if (widget.media.isNotEmpty) ...[
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              for (var file in widget.media)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: MacosTheme.of(context)
+                                              .dividerColor,
+                                        ),
+                                        child: file['type'] == 'video'
+                                            ? Container()
+                                            : ExtendedImage.file(
+                                                File(file['path']),
+                                                fit: BoxFit.cover,
+                                                shape: BoxShape.rectangle,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                      ),
+                                      Positioned(
+                                        bottom: 5,
+                                        left: 5,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(4)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Text(
+                                              file['type'] == 'video'
+                                                  ? 'VID'
+                                                  : file['type'] == 'gif'
+                                                      ? 'GIF'
+                                                      : 'IMG',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 5,
+                                        right: 5,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(7)),
+                                          child: MacosIconButton(
+                                            boxConstraints:
+                                                const BoxConstraints(
+                                                    minWidth: 12,
+                                                    minHeight: 12,
+                                                    maxHeight: 20,
+                                                    maxWidth: 20),
+                                            padding: const EdgeInsets.all(4),
+                                            icon: const MacosIcon(
+                                              CupertinoIcons.clear,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () {
+                                              widget.media.remove(file);
+                                              widget
+                                                  .onMediaChange(widget.media);
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      )
+                    ],
                     Container(
                       constraints: const BoxConstraints(maxWidth: 400),
                       child: Row(
@@ -199,26 +340,28 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                                     minHeight: 30,
                                     maxHeight: 40,
                                     maxWidth: 40),
-                                onPressed: () async {
-                                  FilePickerResult? result =
-                                      await FilePicker.platform.pickFiles(
-                                          allowMultiple: true,
-                                          type: FileType.custom,
-                                          allowedExtensions: [
-                                        'jpg',
-                                        'png',
-                                        'gif',
-                                        'mp4',
-                                        'jpeg',
-                                        'webp',
-                                      ]);
+                                onPressed: widget.media.length < 4
+                                    ? () async {
+                                        FilePickerResult? result =
+                                            await FilePicker.platform.pickFiles(
+                                                allowMultiple: true,
+                                                type: FileType.custom,
+                                                allowedExtensions: [
+                                              'jpg',
+                                              'png',
+                                              'gif',
+                                              'mp4',
+                                              'jpeg',
+                                              'webp',
+                                            ]);
 
-                                  if (result != null) {
-                                    List<File> files = result.paths
-                                        .map((path) => File(path!))
-                                        .toList();
-                                  }
-                                },
+                                        if (result != null) {
+                                          onFilesPick(result.files
+                                              .map((e) => e.path!)
+                                              .toList());
+                                        }
+                                      }
+                                    : null,
                                 icon: const MacosIcon(Icons.photo_outlined),
                               ),
                               MacosIconButton(
@@ -246,9 +389,11 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                               if (widget.tweets.indexOf(widget.tweet) ==
                                   widget.tweets.length - 1)
                                 MacosIconButton(
-                                  onPressed: widget.controller.text.isNotEmpty
-                                      ? widget.onAdd
-                                      : null,
+                                  onPressed:
+                                      widget.controller.text.isNotEmpty ||
+                                              widget.media.isNotEmpty
+                                          ? widget.onAdd
+                                          : null,
                                   hoverColor: Colors.blue.withOpacity(0.6),
                                   backgroundColor: Colors.blue,
                                   icon: const MacosIcon(
@@ -310,5 +455,24 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
         ],
       ),
     );
+  }
+
+  void showAlert(BuildContext context) {
+    showMacosAlertDialog(
+        context: context,
+        builder: (_) => MacosAlertDialog(
+              appIcon: const FlutterLogo(size: 55),
+              title: const Text(
+                "Oops!",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              message: const Text(
+                  "Sorry, you can only upload a maximum of 4 images/gifs and one video in a single tweet."),
+              primaryButton: PushButton(
+                buttonSize: ButtonSize.large,
+                child: const Text("Ok"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ));
   }
 }

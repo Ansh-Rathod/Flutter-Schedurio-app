@@ -928,7 +928,7 @@ class _CustomMacosPulldownButtonState extends State<CustomMacosPulldownButton>
                 ),
                 color: MacosTheme.of(context).primaryColor),
             height: 41.0,
-            width: 16.0,
+            width: 20.0,
             child: const Icon(
               Icons.arrow_drop_down,
               color: Colors.white,

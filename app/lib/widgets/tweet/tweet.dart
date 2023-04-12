@@ -69,7 +69,7 @@ class _TweetWidgetState extends State<TweetWidget> {
         children: [
           Text(
               widget.fullFormate
-                  ? '${widget.tweet.postedAt.toWeekDay()} ${widget.tweet.postedAt.toLocal().hour}:${widget.tweet.postedAt.toLocal().minute}'
+                  ? '${widget.tweet.postedAt.formatedString()} ${widget.tweet.postedAt.toLocal().hour}:${widget.tweet.postedAt.toLocal().minute}'
                   : '${widget.tweet.postedAt.toLocal().hour}:${widget.tweet.postedAt.toLocal().minute}',
               style: const TextStyle(
                 fontSize: 12,

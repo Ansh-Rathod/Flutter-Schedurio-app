@@ -6,6 +6,7 @@ import 'package:schedurio/screens/home/home_screen.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 
 import 'config.dart';
+import 'screens/queue_screen/queue_screen.dart';
 import 'screens/walk_through/walk_through_screen.dart';
 import 'services/hive_cache.dart';
 
@@ -49,9 +50,10 @@ class _AppLayoutState extends State<AppLayout> {
   late final searchFieldController = TextEditingController();
 
   final List<Widget> pages = [
-    const HomeScreen(),
     const CreateTweet(),
-    const PostingScheduleWidget()
+    const PostingScheduleWidget(),
+    const QueueScreen(),
+    const HomeScreen(),
   ];
 
   @override
@@ -136,10 +138,6 @@ class _AppLayoutState extends State<AppLayout> {
             itemSize: SidebarItemSize.large,
             items: [
               const SidebarItem(
-                leading: MacosIcon(CupertinoIcons.home),
-                label: Text('Home'),
-              ),
-              const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.add),
                 label: Text('Create'),
               ),
@@ -178,10 +176,6 @@ class _AppLayoutState extends State<AppLayout> {
               const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.star),
                 label: Text('Favorites'),
-              ),
-              const SidebarItem(
-                leading: MacosIcon(CupertinoIcons.lightbulb),
-                label: Text('Tips'),
               ),
               const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.settings),

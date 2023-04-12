@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/helpers.dart';
 
 import '../../widgets/create_tweet_widget.dart';
 import '../../widgets/custom_pull_down_button.dart';
@@ -14,7 +16,7 @@ class CreateTweet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CreateTweetCubit(),
+      create: (context) => CreateTweetCubit()..init(),
       child: BlocBuilder<CreateTweetCubit, CreateTweetState>(
         builder: (context, state) {
           return Container(
@@ -31,8 +33,32 @@ class CreateTweet extends StatelessWidget {
                           const SizedBox(
                             height: 20,
                           ),
+                          Container(
+                            constraints: const BoxConstraints(
+                              maxWidth: 470,
+                            ),
+                            child: Row(
+                              children: const [
+                                Text(
+                                  "Create Tweet",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
                           ...state.tweets
                               .map((tweet) => CreateTweetWidget(
+                                    media: tweet['media'],
+                                    onMediaChange: (List<dynamic> media) {
+                                      BlocProvider.of<CreateTweetCubit>(context)
+                                          .onMediaChange(tweet['id'], media);
+                                    },
                                     controller: tweet['controller'],
                                     onAdd: BlocProvider.of<CreateTweetCubit>(
                                             context)
@@ -53,25 +79,100 @@ class CreateTweet extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomPushButton(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(7),
-                            bottomLeft: Radius.circular(7),
+                Container(
+                  decoration: BoxDecoration(
+                    color: MacosTheme.of(context).canvasColor,
+                    border: Border(
+                      top: BorderSide(
+                          width: 1, color: MacosTheme.of(context).dividerColor),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(children: [
+                          Text(
+                            state.selected.toLocal().formatedString(),
+                            style: TextStyle(
+                              color: MacosTheme.of(context).primaryColor,
+                            ),
                           ),
-                          onPressed: () {},
-                          buttonSize: CustomButtonSize.large,
-                          child: const Text("Add To Queue")),
-                      const CustomMacosPulldownButton(items: [
-                        CustomMacosPulldownMenuItem(title: Text("Post now")),
-                        CustomMacosPulldownMenuItem(
-                            title: Text("Save as draft")),
-                      ])
-                    ],
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          MacosPopupButton(
+                              onChanged: (value) {
+                                BlocProvider.of<CreateTweetCubit>(context)
+                                    .changeSelected(value!);
+                              },
+                              value: state.selected,
+                              items: [
+                                ...state.availableTimesForDay
+                                    .map(
+                                      (e) => MacosPopupMenuItem(
+                                        value: e,
+                                        child: Text(
+                                          TimeOfDay(
+                                                  hour: e.toLocal().hour,
+                                                  minute: e.toLocal().day)
+                                              .format(context),
+                                        ),
+                                      ),
+                                    )
+                                    .toList()
+                              ]),
+                        ]),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CustomPushButton(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(7),
+                                  bottomLeft: Radius.circular(7),
+                                ),
+                                onPressed: state.tweets.every((e) =>
+                                            e['content'] != '' ||
+                                            e['media'].isNotEmpty) &&
+                                        state.status !=
+                                            CreateTweetStatus.loading
+                                    ? () {
+                                        BlocProvider.of<CreateTweetCubit>(
+                                                context)
+                                            .onAddToQueue();
+                                      }
+                                    : null,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                buttonSize: CustomButtonSize.large,
+                                child: state.status != CreateTweetStatus.loading
+                                    ? const Text(
+                                        "Add",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 14),
+                                      )
+                                    : const ProgressCircle(
+                                        value: null,
+                                      )),
+                            CustomMacosPulldownButton(items: [
+                              CustomMacosPulldownMenuItem(
+                                enabled: state.tweets.every((e) =>
+                                    e['content'] != '' ||
+                                    e['media'].isNotEmpty),
+                                title: const Text("Post now"),
+                              ),
+                              CustomMacosPulldownMenuItem(
+                                enabled: state.tweets.every((e) =>
+                                    e['content'] != '' ||
+                                    e['media'].isNotEmpty),
+                                title: const Text("Save as draft"),
+                              ),
+                            ])
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],
