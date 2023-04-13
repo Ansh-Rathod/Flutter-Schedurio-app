@@ -93,7 +93,9 @@ Future<List<DateTime>> getAvailableQueue() async {
   for (var time in unAvalableList) {
     queue.remove(DateTime.parse(time).toUtc());
     if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
+      print("deleting $time");
       await LocalCache.filledQueue.deleteAt(unAvalableList.indexOf(time));
+      await LocalCache.queue.remove(time);
     }
   }
 

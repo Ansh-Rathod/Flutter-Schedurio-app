@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-part of 'home_screen_cubit.dart';
+part of 'analytics_screen_cubit.dart';
 
-class HomeScreenState {
+class AnalyticsScreenState {
   final DateTime startDate;
   final int noOftweets;
   final int streak;
@@ -15,7 +15,8 @@ class HomeScreenState {
   final List<int> years;
   final List<TweetModel> tweets;
   final bool reverse;
-  HomeScreenState({
+
+  AnalyticsScreenState({
     required this.startDate,
     required this.noOftweets,
     required this.streak,
@@ -31,8 +32,8 @@ class HomeScreenState {
     required this.reverse,
   });
 
-  factory HomeScreenState.initial() {
-    return HomeScreenState(
+  factory AnalyticsScreenState.initial() {
+    return AnalyticsScreenState(
       longestStreak: 0,
       streak: 0,
       years: [],
@@ -49,7 +50,7 @@ class HomeScreenState {
     );
   }
 
-  HomeScreenState copyWith({
+  AnalyticsScreenState copyWith({
     DateTime? startDate,
     int? noOftweets,
     int? streak,
@@ -64,7 +65,7 @@ class HomeScreenState {
     List<TweetModel>? tweets,
     bool? reverse,
   }) {
-    return HomeScreenState(
+    return AnalyticsScreenState(
       startDate: startDate ?? this.startDate,
       noOftweets: noOftweets ?? this.noOftweets,
       streak: streak ?? this.streak,

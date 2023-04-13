@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/screens/analytics/analytics_screen.dart';
 import 'package:schedurio/screens/create_tweet/create_tweet.dart';
-import 'package:schedurio/screens/home/home_screen.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
+import 'package:window_size/window_size.dart';
 
 import 'config.dart';
 import 'screens/queue_screen/queue_screen.dart';
@@ -11,7 +15,13 @@ import 'screens/walk_through/walk_through_screen.dart';
 import 'services/hive_cache.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await LocalCache.init();
+  if (Platform.isMacOS || Platform.isWindows) {
+    setWindowTitle("Schedurio");
+    setWindowMaxSize(const Size(1000, 600));
+    setWindowMinSize(const Size(800, 500));
+  }
   runApp(const SchedurioApp());
 }
 
@@ -24,7 +34,7 @@ class SchedurioApp extends StatelessWidget {
       title: 'Schedurio',
       theme: MacosThemeData.light(),
       darkTheme: MacosThemeData.dark(),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
       home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
           ? const AppLayout()
@@ -51,9 +61,14 @@ class _AppLayoutState extends State<AppLayout> {
 
   final List<Widget> pages = [
     const CreateTweet(),
-    const PostingScheduleWidget(),
-    const QueueScreen(),
-    const HomeScreen(),
+    LocalCache.schedule.values.isEmpty
+        ? const PostingScheduleWidget()
+        : const QueueScreen(),
+    Container(),
+    const AnalyticScreen(),
+    Container(),
+    Container(),
+    Container(),
   ];
 
   @override
@@ -68,68 +83,9 @@ class _AppLayoutState extends State<AppLayout> {
         ),
       ),
       sidebar: Sidebar(
-        top: MacosSearchField(
-          placeholder: 'Search',
-          controller: searchFieldController,
-          onResultSelected: (result) {
-            switch (result.searchKey) {
-              case 'Buttons':
-                setState(() {
-                  pageIndex = 0;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Indicators':
-                setState(() {
-                  pageIndex = 1;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Fields':
-                setState(() {
-                  pageIndex = 2;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Colors':
-                setState(() {
-                  pageIndex = 3;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Dialogs and Sheets':
-                setState(() {
-                  pageIndex = 5;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Toolbar':
-                setState(() {
-                  pageIndex = 6;
-                  searchFieldController.clear();
-                });
-                break;
-              case 'Selectors':
-                setState(() {
-                  pageIndex = 7;
-                  searchFieldController.clear();
-                });
-                break;
-              default:
-                searchFieldController.clear();
-            }
-          },
-          results: const [
-            SearchResultItem('Buttons'),
-            SearchResultItem('Indicators'),
-            SearchResultItem('Fields'),
-            SearchResultItem('Colors'),
-            SearchResultItem('Dialogs and Sheets'),
-            SearchResultItem('Toolbar'),
-            SearchResultItem('Selectors'),
-          ],
-        ),
         minWidth: 200,
+        maxWidth: 200,
+        dragClosed: false,
         builder: (context, scrollController) {
           return SidebarItems(
             currentIndex: pageIndex,
@@ -142,17 +98,27 @@ class _AppLayoutState extends State<AppLayout> {
                 label: Text('Create'),
               ),
               SidebarItem(
-                leading: const MacosIcon(CupertinoIcons.collections),
-                label: const Text('Queue'),
-                trailing: Text(
-                  '2',
-                  style: TextStyle(
-                    color: MacosTheme.brightnessOf(context) == Brightness.dark
-                        ? MacosColors.tertiaryLabelColor.darkColor
-                        : MacosColors.tertiaryLabelColor,
-                  ),
-                ),
-              ),
+                  leading: const MacosIcon(CupertinoIcons.collections),
+                  label: const Text('Queue'),
+                  trailing: ValueListenableBuilder(
+                    valueListenable:
+                        Hive.box(AppConfig.hiveBoxNames.queue).listenable(),
+                    builder: (conext, value, child) {
+                      if (LocalCache.queue.values.isNotEmpty) {
+                        return Text(
+                          LocalCache.queue.values.length.toString(),
+                          style: TextStyle(
+                            color: MacosTheme.brightnessOf(context) ==
+                                    Brightness.dark
+                                ? MacosColors.tertiaryLabelColor.darkColor
+                                : MacosColors.tertiaryLabelColor,
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  )),
               SidebarItem(
                 leading: const MacosIcon(CupertinoIcons.doc_plaintext),
                 label: const Text('Drafts'),
@@ -195,17 +161,6 @@ class _AppLayoutState extends State<AppLayout> {
           subtitle:
               Text(LocalCache.currentUser.get(AppConfig.hiveKeys.username)),
         ),
-      ),
-      endSidebar: Sidebar(
-        startWidth: 200,
-        minWidth: 200,
-        maxWidth: 300,
-        shownByDefault: false,
-        builder: (context, _) {
-          return const Center(
-            child: Text('End Sidebar'),
-          );
-        },
       ),
       child: IndexedStack(
         index: pageIndex,

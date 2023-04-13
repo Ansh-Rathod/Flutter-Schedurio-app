@@ -12,24 +12,39 @@ part 'create_tweet_state.dart';
 class CreateTweetCubit extends Cubit<CreateTweetState> {
   CreateTweetCubit() : super(CreateTweetState.initial());
 
-  void init() async {
-    final queue = await getAvailableQueue()
-      ..sort();
-    List<DateTime> availableTimes = [];
+  void init({
+    bool? isEdit,
+    DateTime? selected,
+    List<dynamic>? tweets,
+  }) async {
+    if (isEdit != null) {
+      emit(
+        state.copyWith(
+          selected: selected,
+          tweets: tweets!
+              .map((e) => {"controller": TextEditingController(), ...e})
+              .toList(),
+        ),
+      );
+    } else {
+      final queue = await getAvailableQueue()
+        ..sort();
+      List<DateTime> availableTimes = [];
 
-    for (int i = 0; i < 5; i++) {
-      if (queue.first.day == queue[i].day) {
-        availableTimes.add(queue[i]);
+      for (int i = 0; i < 5; i++) {
+        if (queue.first.day == queue[i].day) {
+          availableTimes.add(queue[i]);
+        }
       }
-    }
 
-    emit(
-      state.copyWith(
-        availableQueue: queue,
-        availableTimesForDay: availableTimes,
-        selected: queue.first,
-      ),
-    );
+      emit(
+        state.copyWith(
+          availableQueue: queue,
+          availableTimesForDay: availableTimes,
+          selected: queue.first,
+        ),
+      );
+    }
   }
 
   void changeSelected(DateTime s) {
@@ -67,7 +82,8 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
   void onAddToQueue() async {
     try {
       emit(state.copyWith(status: CreateTweetStatus.loading));
-      await LocalCache.queue.clear();
+      //   await LocalCache.filledQueue.clear();
+      // await LocalCache.queue.clear();
       await LocalCache.filledQueue.add(state.selected.toString());
 
       List<dynamic> tweets = [];
@@ -106,6 +122,8 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
 
       await LocalCache.queue.put(state.selected.toString(), tweets);
       emit(state.copyWith(status: CreateTweetStatus.success));
+      emit(CreateTweetState.initial());
+      init();
     } catch (e) {
       emit(state.copyWith(status: CreateTweetStatus.error));
     }

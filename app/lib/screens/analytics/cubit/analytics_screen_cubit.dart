@@ -4,10 +4,10 @@ import 'package:schedurio_utils/schedurio_utils.dart';
 
 import '../../../services/hive_cache.dart';
 
-part 'home_screen_state.dart';
+part 'analytics_screen_state.dart';
 
-class HomeScreenCubit extends Cubit<HomeScreenState> {
-  HomeScreenCubit() : super(HomeScreenState.initial());
+class AnalyticsScreenCubit extends Cubit<AnalyticsScreenState> {
+  AnalyticsScreenCubit() : super(AnalyticsScreenState.initial());
 
   void init() {
     final datasets = LocalCache.tweets.values

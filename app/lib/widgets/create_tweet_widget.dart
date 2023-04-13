@@ -152,10 +152,14 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                           TextSpan(
                             text: LocalCache.currentUser
                                 .get(AppConfig.hiveKeys.displayName),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
+                            style: TextStyle(
+                              color: MacosTheme.brightnessOf(context) ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           TextSpan(
                             text: ' @' +
