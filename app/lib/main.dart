@@ -131,17 +131,9 @@ class _AppLayoutState extends State<AppLayout> {
                       }
                     },
                   )),
-              SidebarItem(
-                leading: const MacosIcon(CupertinoIcons.doc_plaintext),
-                label: const Text('Drafts'),
-                trailing: Text(
-                  '3',
-                  style: TextStyle(
-                    color: MacosTheme.brightnessOf(context) == Brightness.dark
-                        ? MacosColors.tertiaryLabelColor.darkColor
-                        : MacosColors.tertiaryLabelColor,
-                  ),
-                ),
+              const SidebarItem(
+                leading: MacosIcon(CupertinoIcons.doc_plaintext),
+                label: Text('Drafts'),
               ),
               const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.graph_circle),

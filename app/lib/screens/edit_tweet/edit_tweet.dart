@@ -115,48 +115,59 @@ class EditTweet extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(children: [
-                                  Text(
-                                    state.selected.toLocal().formatedString(),
-                                    style: TextStyle(
-                                      color:
-                                          MacosTheme.of(context).primaryColor,
+                                if (isDraft == null)
+                                  Row(children: [
+                                    Text(
+                                      state.selected.toLocal().formatedString(),
+                                      style: TextStyle(
+                                        color:
+                                            MacosTheme.of(context).primaryColor,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  MacosPopupButton(
-                                      onChanged: (value) {
-                                        BlocProvider.of<EditTweetCubit>(context)
-                                            .changeSelected(value!);
-                                      },
-                                      value: state.selected,
-                                      items: [
-                                        ...state.availableTimesForDay
-                                            .map(
-                                              (e) => MacosPopupMenuItem(
-                                                value: e,
-                                                child: Text(
-                                                  TimeOfDay(
-                                                          hour:
-                                                              e.toLocal().hour,
-                                                          minute:
-                                                              e.toLocal().day)
-                                                      .format(context),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    MacosPopupButton(
+                                        onChanged: (value) {
+                                          BlocProvider.of<EditTweetCubit>(
+                                                  context)
+                                              .changeSelected(value!);
+                                        },
+                                        value: state.selected,
+                                        items: [
+                                          ...state.availableTimesForDay
+                                              .map(
+                                                (e) => MacosPopupMenuItem(
+                                                  value: e,
+                                                  child: Text(
+                                                    TimeOfDay(
+                                                            hour: e
+                                                                .toLocal()
+                                                                .hour,
+                                                            minute:
+                                                                e.toLocal().day)
+                                                        .format(context),
+                                                  ),
                                                 ),
-                                              ),
-                                            )
-                                            .toList()
-                                      ]),
-                                ]),
+                                              )
+                                              .toList()
+                                        ]),
+                                  ])
+                                else
+                                  Container(),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     CustomPushButton(
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(7),
-                                          bottomLeft: Radius.circular(7),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: const Radius.circular(7),
+                                          bottomLeft: const Radius.circular(7),
+                                          topRight: isDraft == null
+                                              ? Radius.zero
+                                              : const Radius.circular(7),
+                                          bottomRight: isDraft == null
+                                              ? Radius.zero
+                                              : const Radius.circular(7),
                                         ),
                                         onPressed: state.editedTweets.every(
                                                     (e) =>
@@ -184,20 +195,23 @@ class EditTweet extends StatelessWidget {
                                             : const ProgressCircle(
                                                 value: null,
                                               )),
-                                    CustomMacosPulldownButton(items: [
-                                      CustomMacosPulldownMenuItem(
-                                        enabled: state.editedTweets.every((e) =>
-                                            e.content != '' ||
-                                            e.media.isNotEmpty),
-                                        title: const Text("Post now"),
-                                      ),
-                                      CustomMacosPulldownMenuItem(
-                                        enabled: state.editedTweets.every((e) =>
-                                            e.content != '' ||
-                                            e.media.isNotEmpty),
-                                        title: const Text("Save as draft"),
-                                      ),
-                                    ])
+                                    if (isDraft == null)
+                                      CustomMacosPulldownButton(items: [
+                                        CustomMacosPulldownMenuItem(
+                                          enabled: state.editedTweets.every(
+                                              (e) =>
+                                                  e.content != '' ||
+                                                  e.media.isNotEmpty),
+                                          title: const Text("Post now"),
+                                        ),
+                                        CustomMacosPulldownMenuItem(
+                                          enabled: state.editedTweets.every(
+                                              (e) =>
+                                                  e.content != '' ||
+                                                  e.media.isNotEmpty),
+                                          title: const Text("Save as draft"),
+                                        ),
+                                      ])
                                   ],
                                 ),
                               ],

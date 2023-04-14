@@ -179,7 +179,7 @@ class QueueDraftTweet extends StatelessWidget {
                                                     Brightness.dark
                                                 ? Colors.white
                                                 : Colors.black87,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(
