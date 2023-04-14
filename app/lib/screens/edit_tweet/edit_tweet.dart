@@ -15,11 +15,13 @@ import 'cubit/edit_tweet_cubit.dart';
 class EditTweet extends StatelessWidget {
   final DateTime selected;
   final List<QueueTweetModel> tweets;
+  final int? isDraft;
 
   const EditTweet({
     Key? key,
     required this.selected,
     required this.tweets,
+    this.isDraft,
   }) : super(key: key);
 
   @override
@@ -43,8 +45,8 @@ class EditTweet extends StatelessWidget {
         children: [
           ContentArea(
             builder: (context, scrollController) => BlocProvider(
-              create: (context) =>
-                  EditTweetCubit()..init(selected: selected, tweets: tweets),
+              create: (context) => EditTweetCubit()
+                ..init(isDraft: isDraft, selected: selected, tweets: tweets),
               child: BlocConsumer<EditTweetCubit, EditTweetState>(
                 listener: (context, state) {
                   if (state.status == EditTweetStatus.success) {

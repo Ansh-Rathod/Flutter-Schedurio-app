@@ -8,6 +8,7 @@ class EditTweetState {
   final List<QueueTweetModel> editedTweets;
   final List<DateTime> availableQueue;
   final DateTime selected;
+  final int? isDraft;
   final List<DateTime> availableTimesForDay;
 
   EditTweetState({
@@ -15,12 +16,14 @@ class EditTweetState {
     required this.editedTweets,
     required this.availableQueue,
     required this.selected,
+    required this.isDraft,
     required this.availableTimesForDay,
   });
 
   factory EditTweetState.initial() {
     return EditTweetState(
       availableQueue: [],
+      isDraft: null,
       status: EditTweetStatus.initial,
       selected: DateTime.now(),
       availableTimesForDay: [],
@@ -33,6 +36,7 @@ class EditTweetState {
     List<QueueTweetModel>? editedTweets,
     List<DateTime>? availableQueue,
     DateTime? selected,
+    int? isDraft,
     List<DateTime>? availableTimesForDay,
   }) {
     return EditTweetState(
@@ -40,6 +44,7 @@ class EditTweetState {
       editedTweets: editedTweets ?? this.editedTweets,
       availableQueue: availableQueue ?? this.availableQueue,
       selected: selected ?? this.selected,
+      isDraft: isDraft ?? this.isDraft,
       availableTimesForDay: availableTimesForDay ?? this.availableTimesForDay,
     );
   }

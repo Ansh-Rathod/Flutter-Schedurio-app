@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:schedurio/models/queue_tweets.dart';
 
+import '../../../helpers.dart';
 import '../../../supabase.dart';
 
 part 'edit_tweet_state.dart';
@@ -11,22 +12,49 @@ class EditTweetCubit extends Cubit<EditTweetState> {
   EditTweetCubit() : super(EditTweetState.initial());
 
   void init({
+    required int? isDraft,
     required DateTime selected,
     required List<QueueTweetModel> tweets,
   }) async {
-    final newTweets = tweets;
-    final selec = selected;
-    for (var element in newTweets) {
-      element.controller.text = element.content;
-    }
+    if (isDraft == null) {
+      final newTweets = tweets;
+      final selec = selected;
+      for (var element in newTweets) {
+        element.controller.text = element.content;
+      }
 
-    emit(
-      state.copyWith(
-        selected: selec,
-        availableTimesForDay: [selec],
-        editedTweets: newTweets,
-      ),
-    );
+      emit(
+        state.copyWith(
+          selected: selec,
+          availableTimesForDay: [selec],
+          editedTweets: newTweets,
+        ),
+      );
+    } else {
+      final queue = await getAvailableQueue()
+        ..sort();
+      List<DateTime> availableTimes = [];
+
+      for (int i = 0; i < 5; i++) {
+        if (queue.first.day == queue[i].day) {
+          availableTimes.add(queue[i]);
+        }
+      }
+      final newTweets = tweets;
+      for (var element in newTweets) {
+        element.controller.text = element.content;
+      }
+
+      emit(
+        state.copyWith(
+          availableQueue: queue,
+          availableTimesForDay: availableTimes,
+          selected: queue.first,
+          isDraft: isDraft,
+          editedTweets: newTweets,
+        ),
+      );
+    }
   }
 
   void changeSelected(DateTime s) {
@@ -67,12 +95,16 @@ class EditTweetCubit extends Cubit<EditTweetState> {
           }
         }
       }
-
-      await supabase.from('queue').update({
-        "tweets": state.editedTweets.map((e) => e.toJson()).toList(),
-        "scheduled_at": state.selected.toUtc().toString(),
-      }).eq('scheduled_at', state.selected.toUtc().toString());
-      print(state.selected);
+      if (state.isDraft != null) {
+        await supabase.from('drafts').update({
+          "tweets": state.editedTweets.map((e) => e.toJson()).toList(),
+        }).eq('id', state.isDraft);
+      } else {
+        await supabase.from('queue').update({
+          "tweets": state.editedTweets.map((e) => e.toJson()).toList(),
+          "scheduled_at": state.selected.toUtc().toString(),
+        }).eq('scheduled_at', state.selected.toUtc().toString());
+      }
       emit(state.copyWith(status: EditTweetStatus.success));
     } catch (e) {
       print(e);

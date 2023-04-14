@@ -90,19 +90,29 @@ Future<List<DateTime>> getAvailableQueue() async {
       }
     }
   }
-  final unAvalableList = LocalCache.filledQueue.values.toList();
-  final alreadyInQueue = LocalCache.queue.values.toList();
+  final unAvalableList = LocalCache.filledQueue.values
+      .toList()
+      .map((e) =>
+          DateTime.fromMillisecondsSinceEpoch(int.parse("${e}0000")).toUtc())
+      .toList();
+  final alreadyInQueue = LocalCache.queue.values
+      .toList()
+      .map((e) =>
+          DateTime.fromMillisecondsSinceEpoch(int.parse("${e}0000")).toUtc())
+      .toList();
 
-  for (var time in alreadyInQueue) {
-    if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
-      await LocalCache.queue.deleteAt(unAvalableList.indexOf(time));
+  for (var time in unAvalableList) {
+    queue.remove(time);
+    if (queue.first.isBefore(time)) {
+      await LocalCache.filledQueue
+          .remove(removeLastFourZeros(time.millisecondsSinceEpoch));
     }
   }
 
-  for (var time in unAvalableList) {
-    queue.remove(DateTime.parse(time).toUtc());
-    if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
-      await LocalCache.filledQueue.deleteAt(unAvalableList.indexOf(time));
+  for (var time in alreadyInQueue) {
+    if (time.isBefore(DateTime.now().toUtc())) {
+      await LocalCache.queue
+          .remove(removeLastFourZeros(time.millisecondsSinceEpoch));
     }
   }
 
@@ -151,4 +161,10 @@ Future<List<QueueModel>> createQueueList(List<dynamic> tweets) async {
   // }
 
   return queue;
+}
+
+int removeLastFourZeros(int number) {
+  final numberString = number.toString();
+  int endIndex = numberString.length - 4;
+  return int.parse(numberString.substring(0, endIndex));
 }

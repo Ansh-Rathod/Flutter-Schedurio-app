@@ -38,7 +38,7 @@ abstract class HiveContract<E> {
 
   //  remove methods
   /// remove value from hive box
-  Future<void> remove(String key);
+  Future<void> remove(dynamic key);
 
   /// delete value from hive box at index
   Future<void> deleteAt(int index);
@@ -106,7 +106,10 @@ class HiveStorageImplementation<E> implements HiveContract<E> {
   }
 
   @override
-  Future<void> remove(String key) async {
+  Future<void> remove(dynamic key) async {
+    print(key);
+    print(key is int);
+    print(key is String);
     _guard();
     await _box.delete(key);
   }

@@ -13,6 +13,9 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
   CreateTweetCubit() : super(CreateTweetState.initial());
 
   void init() async {
+    // await LocalCache.filledQueue.clear();
+    // await LocalCache.queue.clear();
+
     final queue = await getAvailableQueue()
       ..sort();
     List<DateTime> availableTimes = [];
@@ -78,14 +81,19 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         "cron_media":
             dateTimeToCron(state.selected.subtract(const Duration(minutes: 10)))
       });
+      final id =
+          removeLastFourZeros(state.selected.toUtc().millisecondsSinceEpoch);
+      print(id);
+      await LocalCache.filledQueue.put(id, id);
+      await LocalCache.queue.put(id, id);
 
-      await LocalCache.filledQueue.add(state.selected.toString());
-      await LocalCache.queue.add(state.selected.toUtc().toString());
+      print('added to queue');
 
       emit(state.copyWith(status: CreateTweetStatus.success));
       emit(CreateTweetState.initial());
       init();
     } catch (e) {
+      print(e.toString());
       emit(state.copyWith(status: CreateTweetStatus.error));
     }
   }

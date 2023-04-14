@@ -43,4 +43,16 @@ class QueueScreenCubit extends Cubit<QueueScreenState> {
       emit(state.copyWith(status: FetchTweetsStatus.error));
     }
   }
+
+  void removeTweet(DateTime dateTime, DateTime fullDate) {
+    state.queue
+        .where((element) => element.dateTime == dateTime)
+        .first
+        .times
+        .where((element) => element.fullDate == fullDate)
+        .first
+        .tweets = null;
+
+    emit(state.copyWith(queue: state.queue));
+  }
 }

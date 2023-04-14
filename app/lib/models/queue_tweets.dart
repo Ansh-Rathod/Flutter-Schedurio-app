@@ -60,7 +60,7 @@ class QueueTweetModel {
       media: [],
       polls: [],
       controller: TextEditingController(),
-      createdAt: DateTime.now().toString(),
+      createdAt: DateTime.now().toUtc().toString(),
     );
   }
 }

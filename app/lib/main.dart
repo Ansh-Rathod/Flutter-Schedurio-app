@@ -8,6 +8,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/screens/analytics/analytics_screen.dart';
 import 'package:schedurio/screens/create_tweet/create_tweet.dart';
+import 'package:schedurio/screens/create_tweet/cubit/create_tweet_cubit.dart';
+import 'package:schedurio/screens/drafts/cubit/drafts_screen_cubit.dart';
+import 'package:schedurio/screens/drafts/drafts_screen.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
 import 'package:window_size/window_size.dart';
@@ -57,23 +60,23 @@ class AppLayout extends StatefulWidget {
 }
 
 class _AppLayoutState extends State<AppLayout> {
-  double ratingValue = 0;
-  double sliderValue = 0;
-  bool value = false;
-
   int pageIndex = 0;
 
-  late final searchFieldController = TextEditingController();
-
   final List<Widget> pages = [
-    const CreateTweet(),
+    BlocProvider(
+      create: (context) => CreateTweetCubit()..init(),
+      child: const CreateTweet(),
+    ),
     LocalCache.schedule.values.isEmpty
         ? const PostingScheduleWidget()
         : BlocProvider<QueueScreenCubit>(
             create: (context) => QueueScreenCubit()..init(),
             child: const QueueScreen(),
           ),
-    Container(),
+    BlocProvider(
+      create: (context) => DraftsScreenCubit()..init(),
+      child: const DraftsScreen(),
+    ),
     const AnalyticScreen(),
     Container(),
     Container(),
@@ -171,10 +174,7 @@ class _AppLayoutState extends State<AppLayout> {
               Text(LocalCache.currentUser.get(AppConfig.hiveKeys.username)),
         ),
       ),
-      child: IndexedStack(
-        index: pageIndex,
-        children: pages,
-      ),
+      child: pages[pageIndex],
     );
   }
 }

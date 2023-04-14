@@ -2,15 +2,13 @@
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
 import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
+import 'package:schedurio/services/hive_cache.dart';
 
-import '../../config.dart';
 import '../../models/queue_tweets.dart';
 import '../../supabase.dart';
 import '../edit_tweet/edit_tweet.dart';
@@ -23,18 +21,6 @@ class QueueScreen extends StatefulWidget {
 }
 
 class _QueueScreenState extends State<QueueScreen> {
-  ValueListenable get listenable =>
-      Hive.box(AppConfig.hiveBoxNames.queue).listenable();
-
-  @override
-  void initState() {
-    listenable.addListener(() {
-      setState(() {});
-      BlocProvider.of<QueueScreenCubit>(context).init();
-    });
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MacosScaffold(
@@ -216,14 +202,15 @@ class _QueueScreenState extends State<QueueScreen> {
                                                                         MacosSheet(
                                                                           child:
                                                                               EditTweet(
+                                                                            isDraft:
+                                                                                null,
                                                                             tweets:
                                                                                 e.copy().tweets!,
                                                                             selected:
-                                                                                queueItem.dateTime.toUtc(),
+                                                                                e.fullDate.toUtc(),
                                                                           ),
                                                                         ));
-                                                            print(
-                                                                updayedTweets);
+
                                                             if (updayedTweets !=
                                                                 null) {
                                                               e.tweets =
@@ -288,17 +275,38 @@ class _QueueScreenState extends State<QueueScreen> {
                                                             const MacosPulldownMenuDivider(),
                                                             MacosPulldownMenuItem(
                                                               onTap: () async {
-//TODO delete from the local cache
                                                                 await supabase
                                                                     .from(
                                                                         'queue')
                                                                     .delete()
                                                                     .eq(
-                                                                        'scheduled_at',
+                                                                      'scheduled_at',
+                                                                      e.fullDate
+                                                                          .toUtc()
+                                                                          .toString(),
+                                                                    );
+
+                                                                await LocalCache
+                                                                    .filledQueue
+                                                                    .remove(removeLastFourZeros(e
+                                                                        .fullDate
+                                                                        .toUtc()
+                                                                        .millisecondsSinceEpoch));
+
+                                                                await LocalCache
+                                                                    .queue
+                                                                    .remove(removeLastFourZeros(e
+                                                                        .fullDate
+                                                                        .toUtc()
+                                                                        .millisecondsSinceEpoch));
+
+                                                                BlocProvider.of<
+                                                                            QueueScreenCubit>(
+                                                                        context)
+                                                                    .removeTweet(
                                                                         queueItem
-                                                                            .dateTime
-                                                                            .toUtc()
-                                                                            .toString());
+                                                                            .dateTime,
+                                                                        e.fullDate);
                                                               },
                                                               title: const Text(
                                                                   "Delete"),
