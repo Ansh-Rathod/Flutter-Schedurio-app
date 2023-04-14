@@ -1,26 +1,31 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/screens/analytics/analytics_screen.dart';
 import 'package:schedurio/screens/create_tweet/create_tweet.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
+import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
 import 'package:window_size/window_size.dart';
 
 import 'config.dart';
 import 'screens/queue_screen/queue_screen.dart';
-import 'screens/walk_through/walk_through_screen.dart';
 import 'services/hive_cache.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalCache.init();
-  if (Platform.isMacOS || Platform.isWindows) {
-    setWindowTitle("Schedurio");
-    setWindowMaxSize(const Size(1000, 600));
-    setWindowMinSize(const Size(800, 500));
+
+  if (!kIsWeb) {
+    if (Platform.isMacOS || Platform.isWindows) {
+      setWindowTitle("Schedurio");
+      setWindowMaxSize(const Size(1000, 600));
+      setWindowMinSize(const Size(800, 500));
+    }
   }
   runApp(const SchedurioApp());
 }
@@ -34,11 +39,12 @@ class SchedurioApp extends StatelessWidget {
       title: 'Schedurio',
       theme: MacosThemeData.light(),
       darkTheme: MacosThemeData.dark(),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
-          ? const AppLayout()
-          : const WalkThroughScreen(),
+      // home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
+      // ? const AppLayout()
+      // : const WalkThroughScreen(),
+      home: const AppLayout(),
     );
   }
 }
@@ -63,7 +69,10 @@ class _AppLayoutState extends State<AppLayout> {
     const CreateTweet(),
     LocalCache.schedule.values.isEmpty
         ? const PostingScheduleWidget()
-        : const QueueScreen(),
+        : BlocProvider<QueueScreenCubit>(
+            create: (context) => QueueScreenCubit()..init(),
+            child: const QueueScreen(),
+          ),
     Container(),
     const AnalyticScreen(),
     Container(),

@@ -1,6 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:schedurio/services/hive_cache.dart';
+
+import 'models/queue_model.dart';
 
 extension DateTimeHelper on DateTime {
   //To weekDay Fri or Fri 04
@@ -68,7 +71,7 @@ String dateTimeToCron(DateTime dateTime) {
 
 Future<List<DateTime>> getAvailableQueue() async {
   List<DateTime> queue = [];
-  for (int i = 0; i < 30; i++) {
+  for (int i = 0; i < 15; i++) {
     final dateTime = DateTime.now().add(Duration(days: i));
     final times = LocalCache.schedule.get(dateTime.getWeekDayName());
 
@@ -87,17 +90,65 @@ Future<List<DateTime>> getAvailableQueue() async {
       }
     }
   }
-
   final unAvalableList = LocalCache.filledQueue.values.toList();
+  final alreadyInQueue = LocalCache.queue.values.toList();
+
+  for (var time in alreadyInQueue) {
+    if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
+      await LocalCache.queue.deleteAt(unAvalableList.indexOf(time));
+    }
+  }
 
   for (var time in unAvalableList) {
     queue.remove(DateTime.parse(time).toUtc());
     if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
-      print("deleting $time");
       await LocalCache.filledQueue.deleteAt(unAvalableList.indexOf(time));
-      await LocalCache.queue.remove(time);
     }
   }
+
+  return queue;
+}
+
+Future<List<QueueModel>> createQueueList(List<dynamic> tweets) async {
+  List<QueueModel> queue = [];
+  for (int i = 0; i < 15; i++) {
+    final dateTime = DateTime.now().add(Duration(days: i));
+    final times = LocalCache.schedule.get(dateTime.getWeekDayName());
+
+    List<QueueDayTime> allTimes = [];
+    for (var j in times) {
+      final time = TimeOfDay(
+          hour: int.parse(j.split(':')[0]), minute: int.parse(j.split(':')[1]));
+      final date = DateTime(
+          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+
+      // final isAfter = date.isBefore(DateTime.now());
+      final tweetsOnTime = tweets.firstWhere(
+        (e) => e['scheduled_at'] == date.toUtc().toString(),
+        orElse: () => null,
+      );
+      allTimes.add(QueueDayTime(
+          time: time,
+          fullDate: date,
+          tweets: tweetsOnTime != null ? tweetsOnTime['tweets'] : null));
+      print(tweetsOnTime);
+    }
+    queue.add(
+      QueueModel(
+        dateTime: DateTime(dateTime.year, dateTime.month, dateTime.day),
+        times: allTimes,
+      ),
+    );
+  }
+
+  // final unAvalableList = LocalCache.filledQueue.values.toList();
+
+  // for (var time in unAvalableList) {
+  //   queue.remove(DateTime.parse(time).toUtc());
+  //   if (queue.first.isBefore(DateTime.parse(time).toUtc())) {
+  //     await LocalCache.filledQueue.deleteAt(unAvalableList.indexOf(time));
+  //   }
+  // }
 
   return queue;
 }

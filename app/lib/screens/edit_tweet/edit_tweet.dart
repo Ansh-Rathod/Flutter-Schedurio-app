@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -11,43 +10,47 @@ import 'package:schedurio/models/queue_tweets.dart';
 import '../../widgets/create_tweet_widget.dart';
 import '../../widgets/custom_pull_down_button.dart';
 import '../../widgets/custom_push_button.dart';
-import 'cubit/create_tweet_cubit.dart';
+import 'cubit/edit_tweet_cubit.dart';
 
-class CreateTweet extends StatelessWidget {
-  const CreateTweet({
+class EditTweet extends StatelessWidget {
+  final DateTime selected;
+  final List<QueueTweetModel> tweets;
+
+  const EditTweet({
     Key? key,
+    required this.selected,
+    required this.tweets,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MacosScaffold(
         toolBar: ToolBar(
+          automaticallyImplyLeading: false,
           height: 45,
-          title: const Text(
-            "Create Tweet",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
-          ),
-          titleWidth: 250,
           actions: [
             ToolBarIconButton(
               label: 'Toggle Sidebar',
               icon: const MacosIcon(
-                CupertinoIcons.sidebar_left,
+                Icons.close,
               ),
-              onPressed: () => MacosWindowScope.of(context).toggleSidebar(),
+              onPressed: () => Navigator.of(context).pop(),
               showLabel: false,
-              tooltipMessage: 'Toggle Sidebar',
+              tooltipMessage: 'Close Dialog',
             ),
           ],
         ),
         children: [
           ContentArea(
             builder: (context, scrollController) => BlocProvider(
-              create: (context) => CreateTweetCubit()..init(),
-              child: BlocBuilder<CreateTweetCubit, CreateTweetState>(
+              create: (context) =>
+                  EditTweetCubit()..init(selected: selected, tweets: tweets),
+              child: BlocConsumer<EditTweetCubit, EditTweetState>(
+                listener: (context, state) {
+                  if (state.status == EditTweetStatus.success) {
+                    Navigator.of(context).pop(state.editedTweets);
+                  }
+                },
                 builder: (context, state) {
                   return Container(
                     color: MacosTheme.of(context).canvasColor,
@@ -65,30 +68,29 @@ class CreateTweet extends StatelessWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    ...state.tweets
+                                    ...state.editedTweets
                                         .map((tweet) => CreateTweetWidget(
                                               media: tweet.media,
-                                              isEdit: false,
+                                              isEdit: true,
                                               onMediaChange:
                                                   (List<QueueMedia> media) {
-                                                BlocProvider.of<
-                                                            CreateTweetCubit>(
+                                                BlocProvider.of<EditTweetCubit>(
                                                         context)
                                                     .onMediaChange(
                                                         tweet.id, media);
                                               },
                                               controller: tweet.controller,
                                               onAdd: BlocProvider.of<
-                                                      CreateTweetCubit>(context)
+                                                      EditTweetCubit>(context)
                                                   .addNewTweet,
                                               onTweetRemove: BlocProvider.of<
-                                                      CreateTweetCubit>(context)
+                                                      EditTweetCubit>(context)
                                                   .removeTweet,
                                               onTextChanged: BlocProvider.of<
-                                                      CreateTweetCubit>(context)
+                                                      EditTweetCubit>(context)
                                                   .updateTweet,
                                               tweet: tweet,
-                                              tweets: state.tweets,
+                                              tweets: state.editedTweets,
                                             ))
                                         .toList(),
                                   ],
@@ -124,8 +126,7 @@ class CreateTweet extends StatelessWidget {
                                   ),
                                   MacosPopupButton(
                                       onChanged: (value) {
-                                        BlocProvider.of<CreateTweetCubit>(
-                                                context)
+                                        BlocProvider.of<EditTweetCubit>(context)
                                             .changeSelected(value!);
                                       },
                                       value: state.selected,
@@ -155,25 +156,25 @@ class CreateTweet extends StatelessWidget {
                                           topLeft: Radius.circular(7),
                                           bottomLeft: Radius.circular(7),
                                         ),
-                                        onPressed: state.tweets.every((e) =>
-                                                    e.content != '' ||
-                                                    e.media.isNotEmpty) &&
+                                        onPressed: state.editedTweets.every(
+                                                    (e) =>
+                                                        e.content != '' ||
+                                                        e.media.isNotEmpty) &&
                                                 state.status !=
-                                                    CreateTweetStatus.loading
-                                            ? () {
-                                                BlocProvider.of<
-                                                            CreateTweetCubit>(
-                                                        context)
-                                                    .onAddToQueue();
+                                                    EditTweetStatus.loading
+                                            ? () async {
+                                                await BlocProvider.of<
+                                                        EditTweetCubit>(context)
+                                                    .onUpdate();
                                               }
                                             : null,
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         buttonSize: CustomButtonSize.large,
                                         child: state.status !=
-                                                CreateTweetStatus.loading
+                                                EditTweetStatus.loading
                                             ? const Text(
-                                                "Add",
+                                                "Update",
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 14),
@@ -183,20 +184,15 @@ class CreateTweet extends StatelessWidget {
                                               )),
                                     CustomMacosPulldownButton(items: [
                                       CustomMacosPulldownMenuItem(
-                                        enabled: state.tweets.every((e) =>
+                                        enabled: state.editedTweets.every((e) =>
                                             e.content != '' ||
                                             e.media.isNotEmpty),
                                         title: const Text("Post now"),
                                       ),
                                       CustomMacosPulldownMenuItem(
-                                        enabled: state.tweets.every((e) =>
+                                        enabled: state.editedTweets.every((e) =>
                                             e.content != '' ||
                                             e.media.isNotEmpty),
-                                        onTap: () {
-                                          BlocProvider.of<CreateTweetCubit>(
-                                                  context)
-                                              .saveToDraft();
-                                        },
                                         title: const Text("Save as draft"),
                                       ),
                                     ])

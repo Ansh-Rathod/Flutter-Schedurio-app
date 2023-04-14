@@ -4,14 +4,16 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
-import 'package:schedurio/screens/create_tweet/create_tweet.dart';
-import 'package:schedurio/services/hive_cache.dart';
+import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
 
 import '../../config.dart';
+import '../../models/queue_tweets.dart';
 import '../../supabase.dart';
+import '../edit_tweet/edit_tweet.dart';
 
 class QueueScreen extends StatefulWidget {
   const QueueScreen({super.key});
@@ -27,8 +29,8 @@ class _QueueScreenState extends State<QueueScreen> {
   @override
   void initState() {
     listenable.addListener(() {
-      print("value");
       setState(() {});
+      BlocProvider.of<QueueScreenCubit>(context).init();
     });
     super.initState();
   }
@@ -63,213 +65,264 @@ class _QueueScreenState extends State<QueueScreen> {
             builder: (context, scrollController) => Container(
               color: MacosTheme.of(context).canvasColor,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 30,
-                      itemBuilder: (context, i) {
-                        final dateTime = DateTime.now().add(Duration(days: i));
-                        final times =
-                            LocalCache.schedule.get(dateTime.getWeekDayName());
+              child: BlocBuilder<QueueScreenCubit, QueueScreenState>(
+                builder: (context, state) {
+                  if (state.status == FetchTweetsStatus.loading) {
+                    return const Center(
+                      child: ProgressCircle(value: null),
+                    );
+                  }
+                  if (state.status == FetchTweetsStatus.error) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("Something went wrong!"),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          PushButton(
+                            buttonSize: ButtonSize.small,
+                            child: const Text("Try again!"),
+                            onPressed: () {
+                              BlocProvider.of<QueueScreenCubit>(context).init();
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  }
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              dateTime.getQueueString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: times.length,
-                              itemBuilder: (context, i) {
-                                final time = TimeOfDay(
-                                    hour: int.parse(times[i].split(':')[0]),
-                                    minute: int.parse(times[i].split(':')[1]));
-                                final isAfter = DateTime(
-                                        dateTime.year,
-                                        dateTime.month,
-                                        dateTime.day,
-                                        time.hour,
-                                        time.minute)
-                                    .isBefore(DateTime.now());
+                  if (state.status == FetchTweetsStatus.inital) {
+                    return Container();
+                  }
 
-                                final getTweet = LocalCache.queue.get(DateTime(
-                                        dateTime.year,
-                                        dateTime.month,
-                                        dateTime.day,
-                                        time.hour,
-                                        time.minute)
-                                    .toUtc()
-                                    .toString());
-
-                                return Opacity(
-                                  opacity: isAfter ? 0.5 : 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(10)),
-                                        color:
-                                            MacosTheme.brightnessOf(context) !=
-                                                    Brightness.dark
-                                                ? const Color(0xfff1f0f5)
-                                                : const Color(0xff2e2e2e),
-                                      ),
-                                      padding: const EdgeInsets.all(20),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                time.format(context),
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 7,
-                                              ),
-                                              if (getTweet != null &&
-                                                  getTweet.length > 1)
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 4,
-                                                      vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                      color:
-                                                          MacosTheme.of(context)
-                                                              .canvasColor),
-                                                  child: Text(
-                                                    getTweet != null &&
-                                                            getTweet.length > 1
-                                                        ? "Thread"
-                                                        : "",
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          if (getTweet != null)
-                                            Expanded(
-                                              child: QueueTweet(
-                                                tweet: getTweet,
-                                              ),
-                                            ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          if (getTweet != null && !isAfter)
-                                            MacosPulldownButton(
-                                                icon: CupertinoIcons.ellipsis,
-                                                items: [
-                                                  const MacosPulldownMenuItem(
-                                                    title: Text("Post now"),
-                                                  ),
-                                                  const MacosPulldownMenuDivider(),
-                                                  MacosPulldownMenuItem(
-                                                    onTap: () async {
-                                                      await LocalCache.queue
-                                                          .remove(DateTime(
-                                                                  dateTime.year,
-                                                                  dateTime
-                                                                      .month,
-                                                                  dateTime.day,
-                                                                  time.hour,
-                                                                  time.minute)
-                                                              .toUtc()
-                                                              .toString());
-
-                                                      await supabase
-                                                          .from('queue')
-                                                          .delete()
-                                                          .eq(
-                                                              'scheduled_at',
-                                                              DateTime(
-                                                                      dateTime
-                                                                          .year,
-                                                                      dateTime
-                                                                          .month,
-                                                                      dateTime
-                                                                          .day,
-                                                                      time.hour,
-                                                                      time.minute)
-                                                                  .toUtc()
-                                                                  .toString());
-                                                    },
-                                                    title: const Text("Delete"),
-                                                  ),
-                                                  MacosPulldownMenuItem(
-                                                    title: const Text("Edit"),
-                                                    onTap: () {
-                                                      print("hee");
-
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) =>
-                                                              CreateTweet(
-                                                            tweets: getTweet,
-                                                            selected: DateTime(
-                                                                    dateTime
-                                                                        .year,
-                                                                    dateTime
-                                                                        .month,
-                                                                    dateTime
-                                                                        .day,
-                                                                    time.hour,
-                                                                    time.minute)
-                                                                .toUtc(),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ])
-                                        ],
+                  return SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ...state.queue
+                            .map((queueItem) => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      queueItem.dateTime.getQueueString(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                          ],
-                        );
-                      },
-                    )
-                  ],
-                ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    ...queueItem.times.map(
+                                      (e) {
+                                        final isAfter =
+                                            e.fullDate.isBefore(DateTime.now());
+
+                                        return Opacity(
+                                          opacity: isAfter ? 0.5 : 1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(10)),
+                                                color: MacosTheme.brightnessOf(
+                                                            context) !=
+                                                        Brightness.dark
+                                                    ? const Color(0xfff1f0f5)
+                                                    : const Color(0xff2e2e2e),
+                                              ),
+                                              padding: const EdgeInsets.all(20),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        e.time.format(context),
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 7,
+                                                      ),
+                                                      if (e.tweets != null &&
+                                                          e.tweets!.length > 1)
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal: 4,
+                                                                  vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                              color: MacosTheme
+                                                                      .of(context)
+                                                                  .canvasColor),
+                                                          child: Text(
+                                                            e.tweets!.length > 1
+                                                                ? "Thread"
+                                                                : "",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                          ),
+                                                        )
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Expanded(
+                                                    child: e.tweets != null
+                                                        ? QueueTweetWidget(
+                                                            tweet: e.tweets![0],
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  if (e.tweets != null &&
+                                                      !isAfter) ...[
+                                                    Row(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () async {
+                                                            final updayedTweets =
+                                                                await showMacosSheet(
+                                                                    barrierDismissible:
+                                                                        true,
+                                                                    context:
+                                                                        context,
+                                                                    builder: (_) =>
+                                                                        MacosSheet(
+                                                                          child:
+                                                                              EditTweet(
+                                                                            tweets:
+                                                                                e.copy().tweets!,
+                                                                            selected:
+                                                                                queueItem.dateTime.toUtc(),
+                                                                          ),
+                                                                        ));
+                                                            print(
+                                                                updayedTweets);
+                                                            if (updayedTweets !=
+                                                                null) {
+                                                              e.tweets =
+                                                                  updayedTweets;
+                                                            }
+                                                            setState(() {});
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                border: Border.all(
+                                                                    color: MacosTheme.of(
+                                                                            context)
+                                                                        .dividerColor)),
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(6.0),
+                                                              child: Icon(
+                                                                Icons.edit,
+                                                                size: 16,
+                                                                color: MacosTheme.brightnessOf(
+                                                                            context) ==
+                                                                        Brightness
+                                                                            .dark
+                                                                    ? Colors
+                                                                        .grey
+                                                                        .shade300
+                                                                    : MacosColors
+                                                                        .black,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          border: Border.all(
+                                                              color: MacosTheme
+                                                                      .of(context)
+                                                                  .dividerColor)),
+                                                      child:
+                                                          MacosPulldownButton(
+                                                              icon:
+                                                                  CupertinoIcons
+                                                                      .ellipsis,
+                                                              items: [
+                                                            const MacosPulldownMenuItem(
+                                                              title: Text(
+                                                                  "Post now"),
+                                                            ),
+                                                            const MacosPulldownMenuDivider(),
+                                                            MacosPulldownMenuItem(
+                                                              onTap: () async {
+//TODO delete from the local cache
+                                                                await supabase
+                                                                    .from(
+                                                                        'queue')
+                                                                    .delete()
+                                                                    .eq(
+                                                                        'scheduled_at',
+                                                                        queueItem
+                                                                            .dateTime
+                                                                            .toUtc()
+                                                                            .toString());
+                                                              },
+                                                              title: const Text(
+                                                                  "Delete"),
+                                                            ),
+                                                          ]),
+                                                    )
+                                                  ]
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
+                                ))
+                            .toList()
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -277,9 +330,9 @@ class _QueueScreenState extends State<QueueScreen> {
   }
 }
 
-class QueueTweet extends StatelessWidget {
-  final dynamic tweet;
-  const QueueTweet({
+class QueueTweetWidget extends StatelessWidget {
+  final QueueTweetModel tweet;
+  const QueueTweetWidget({
     Key? key,
     required this.tweet,
   }) : super(key: key);
@@ -296,10 +349,10 @@ class QueueTweet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (tweet[0]['content'].isNotEmpty)
+              if (tweet.content.isNotEmpty)
                 Flexible(
                   child: Text(
-                    tweet[0]['content'],
+                    tweet.content,
                     maxLines: 2,
                     style: TextStyle(
                       overflow: TextOverflow.ellipsis,
@@ -310,8 +363,8 @@ class QueueTweet extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (tweet[0]['media'].isNotEmpty) ...[
-                if (tweet[0]['content'].isNotEmpty)
+              if (tweet.media.isNotEmpty) ...[
+                if (tweet.content.isNotEmpty)
                   const SizedBox(
                     height: 10,
                   ),
@@ -321,7 +374,7 @@ class QueueTweet extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        for (var file in tweet[0]['media'])
+                        for (var file in tweet.media)
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: Stack(
@@ -333,10 +386,10 @@ class QueueTweet extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(5),
                                     color: MacosTheme.of(context).dividerColor,
                                   ),
-                                  child: file['type'] == 'video'
+                                  child: file.type == 'video'
                                       ? Container()
                                       : ExtendedImage.network(
-                                          file['url'],
+                                          file.url!,
                                           fit: BoxFit.cover,
                                           loadStateChanged:
                                               (ExtendedImageState state) {
@@ -366,11 +419,7 @@ class QueueTweet extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
-                                        file['type'] == 'video'
-                                            ? 'VID'
-                                            : file['type'] == 'gif'
-                                                ? 'GIF'
-                                                : 'IMG',
+                                        file.type,
                                         style: const TextStyle(
                                             color: Colors.white, fontSize: 8),
                                       ),

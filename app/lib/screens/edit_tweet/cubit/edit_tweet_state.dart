@@ -1,45 +1,43 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-part of 'create_tweet_cubit.dart';
+part of 'edit_tweet_cubit.dart';
 
-enum CreateTweetStatus { initial, loading, success, error }
+enum EditTweetStatus { initial, loading, success, error }
 
-class CreateTweetState {
-  final CreateTweetStatus status;
-  final List<QueueTweetModel> tweets;
+class EditTweetState {
+  final EditTweetStatus status;
+  final List<QueueTweetModel> editedTweets;
   final List<DateTime> availableQueue;
   final DateTime selected;
   final List<DateTime> availableTimesForDay;
 
-  CreateTweetState({
+  EditTweetState({
     required this.status,
-    required this.tweets,
+    required this.editedTweets,
     required this.availableQueue,
     required this.selected,
     required this.availableTimesForDay,
   });
 
-  factory CreateTweetState.initial() {
-    return CreateTweetState(
+  factory EditTweetState.initial() {
+    return EditTweetState(
       availableQueue: [],
-      status: CreateTweetStatus.initial,
+      status: EditTweetStatus.initial,
       selected: DateTime.now(),
       availableTimesForDay: [],
-      tweets: [
-        QueueTweetModel.inital(),
-      ],
+      editedTweets: [],
     );
   }
 
-  CreateTweetState copyWith({
-    CreateTweetStatus? status,
-    List<QueueTweetModel>? tweets,
+  EditTweetState copyWith({
+    EditTweetStatus? status,
+    List<QueueTweetModel>? editedTweets,
     List<DateTime>? availableQueue,
     DateTime? selected,
     List<DateTime>? availableTimesForDay,
   }) {
-    return CreateTweetState(
+    return EditTweetState(
       status: status ?? this.status,
-      tweets: tweets ?? this.tweets,
+      editedTweets: editedTweets ?? this.editedTweets,
       availableQueue: availableQueue ?? this.availableQueue,
       selected: selected ?? this.selected,
       availableTimesForDay: availableTimesForDay ?? this.availableTimesForDay,

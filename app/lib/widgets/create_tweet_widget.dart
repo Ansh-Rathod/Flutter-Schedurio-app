@@ -1,7 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:io';
-
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,29 +7,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:path/path.dart' as path;
+import 'package:schedurio/models/queue_tweets.dart';
+import 'package:schedurio/widgets/image_widget/image.dart';
 
 import '../config.dart';
 import '../services/hive_cache.dart';
 
 class CreateTweetWidget extends StatefulWidget {
   final TextEditingController controller;
-  final Function(int id, String? value) onTextChanged;
-  final Function(int value) onRemove;
+  final Function(String id, String? value) onTextChanged;
+  final Function(String id) onTweetRemove;
   final Function() onAdd;
-  final List<dynamic> tweets;
-  final List<dynamic> media;
-  final Function(List<dynamic> list) onMediaChange;
-  final dynamic tweet;
+  final List<QueueTweetModel> tweets;
+  final List<QueueMedia> media;
+  final Function(List<QueueMedia> list) onMediaChange;
+  final QueueTweetModel tweet;
+  final bool isEdit;
   const CreateTweetWidget({
     Key? key,
     required this.controller,
     required this.onTextChanged,
-    required this.onRemove,
     required this.onAdd,
     required this.tweets,
     required this.media,
     required this.onMediaChange,
     required this.tweet,
+    required this.isEdit,
+    required this.onTweetRemove,
   }) : super(key: key);
 
   @override
@@ -43,48 +45,48 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
   void onFilesPick(List<String> paths) {
     if (widget.media.length + paths.length > 4) {
       showAlert(context);
-    } else if ((widget.media.map((e) => e['path']).toList() + paths)
+    } else if ((widget.media.map((e) => e.path).toList() + paths)
             .where((element) =>
-                element.substring(element.lastIndexOf('.') + 1) == 'mp4')
+                element!.substring(element.lastIndexOf('.') + 1) == 'mp4')
             .length >
         1) {
       showAlert(context);
     } else {
       if (widget.media.isEmpty) {
         widget.onMediaChange(paths
-            .map((e) => {
-                  'path': e,
-                  'name': path.basename(e),
-                  'extension': e.substring(e.lastIndexOf('.') + 1),
-                  'type': e.substring(e.lastIndexOf('.') + 1) == 'mp4'
-                      ? 'video'
-                      : e.substring(e.lastIndexOf('.') + 1) == 'gif'
-                          ? 'gif'
-                          : 'image'
-                })
+            .map((e) => QueueMedia(
+                mediaId: uuid.v4(),
+                path: e,
+                type: e.substring(e.lastIndexOf('.') + 1) == 'mp4'
+                    ? 'video'
+                    : e.substring(e.lastIndexOf('.') + 1) == 'gif'
+                        ? 'gif'
+                        : 'image',
+                name: path.basename(e),
+                extensionName: e.substring(e.lastIndexOf('.') + 1)))
             .toList());
       } else {
         setState(() {
           final list = widget.media +
               paths
-                  .map((e) => {
-                        'path': e,
-                        'name': path.basename(e),
-                        'extension': e.substring(e.lastIndexOf('.') + 1),
-                        'type': e.substring(e.lastIndexOf('.') + 1) == 'mp4'
-                            ? 'video'
-                            : e.substring(e.lastIndexOf('.') + 1) == 'gif'
-                                ? 'gif'
-                                : 'image'
-                      })
+                  .map((e) => QueueMedia(
+                      mediaId: uuid.v4(),
+                      path: e,
+                      type: e.substring(e.lastIndexOf('.') + 1) == 'mp4'
+                          ? 'video'
+                          : e.substring(e.lastIndexOf('.') + 1) == 'gif'
+                              ? 'gif'
+                              : 'image',
+                      name: path.basename(e),
+                      extensionName: e.substring(e.lastIndexOf('.') + 1)))
                   .toList();
 
-          List<Map<String, dynamic>> distinctList = [];
+          List<QueueMedia> distinctList = [];
 
           for (var item in list) {
             bool isDuplicate = false;
             for (var distinctItem in distinctList) {
-              if (item["name"] == distinctItem["name"]) {
+              if (item.name == distinctItem.name) {
                 isDuplicate = true;
                 break;
               }
@@ -137,6 +139,16 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                   LocalCache.currentUser.get(AppConfig.hiveKeys.profilePicture),
                   width: 40,
                   height: 40,
+                  cache: true,
+                  loadStateChanged: (ExtendedImageState state) {
+                    if (state.extendedImageLoadState == LoadState.loading) {
+                      return Container(
+                        color: MacosTheme.of(context).dividerColor,
+                        child: const ProgressCircle(value: null),
+                      );
+                    }
+                    return null;
+                  },
                   fit: BoxFit.cover,
                   shape: BoxShape.circle,
                 ),
@@ -184,7 +196,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                         maxLines: null,
                         maxLength: 280,
                         onChanged: (value) {
-                          widget.onTextChanged(widget.tweet['id'], value);
+                          widget.onTextChanged(widget.tweet.id, value);
                         },
                         placeholder: 'What\'s happening?',
                         style: TextStyle(
@@ -246,15 +258,13 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                                           color: MacosTheme.of(context)
                                               .dividerColor,
                                         ),
-                                        child: file['type'] == 'video'
+                                        child: file.type == 'video'
                                             ? Container()
-                                            : ExtendedImage.file(
-                                                File(file['path']),
-                                                fit: BoxFit.cover,
-                                                shape: BoxShape.rectangle,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
+                                            : file.path == null
+                                                ? ImageWidget(
+                                                    imgFile: file.url!)
+                                                : ImageWidget(
+                                                    imgFile: file.path!),
                                       ),
                                       Positioned(
                                         bottom: 5,
@@ -268,11 +278,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(4.0),
                                             child: Text(
-                                              file['type'] == 'video'
-                                                  ? 'VID'
-                                                  : file['type'] == 'gif'
-                                                      ? 'GIF'
-                                                      : 'IMG',
+                                              file.type,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 10),
@@ -411,7 +417,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                               if (widget.tweets.indexOf(widget.tweet) != 0)
                                 MacosIconButton(
                                   onPressed: () {
-                                    widget.onRemove.call(widget.tweet['id']);
+                                    widget.onTweetRemove.call(widget.tweet.id);
                                   },
                                   hoverColor:
                                       MacosTheme.brightnessOf(context) ==
