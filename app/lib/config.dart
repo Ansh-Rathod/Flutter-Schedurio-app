@@ -39,7 +39,7 @@ class HiveKeys {
   final String displayName = 'displayName';
 
   /// NOTE:only use in currentUser box
-  final String email = 'email';
+  final String verified = 'verified';
 
   /// NOTE:only use in currentUser box
   final String profilePicture = 'profilePicture';

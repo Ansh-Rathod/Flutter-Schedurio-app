@@ -58,10 +58,10 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                 mediaId: uuid.v4(),
                 path: e,
                 type: e.substring(e.lastIndexOf('.') + 1) == 'mp4'
-                    ? 'video'
+                    ? 'tweet_video'
                     : e.substring(e.lastIndexOf('.') + 1) == 'gif'
-                        ? 'gif'
-                        : 'image',
+                        ? 'tweet_gif'
+                        : 'tweet_image',
                 name: path.basename(e),
                 extensionName: e.substring(e.lastIndexOf('.') + 1)))
             .toList());
@@ -73,10 +73,10 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                       mediaId: uuid.v4(),
                       path: e,
                       type: e.substring(e.lastIndexOf('.') + 1) == 'mp4'
-                          ? 'video'
+                          ? 'tweet_video'
                           : e.substring(e.lastIndexOf('.') + 1) == 'gif'
-                              ? 'gif'
-                              : 'image',
+                              ? 'tweet_gif'
+                              : 'tweet_image',
                       name: path.basename(e),
                       extensionName: e.substring(e.lastIndexOf('.') + 1)))
                   .toList();
@@ -189,7 +189,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      constraints: const BoxConstraints(maxWidth: 400),
+                      constraints: const BoxConstraints(maxWidth: 500),
                       child: MacosTextField.borderless(
                         controller: widget.controller,
                         padding: EdgeInsets.zero,
@@ -212,7 +212,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                       height: 10,
                     ),
                     Container(
-                      constraints: const BoxConstraints(maxWidth: 400),
+                      constraints: const BoxConstraints(maxWidth: 500),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -238,7 +238,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                     ),
                     if (widget.media.isNotEmpty) ...[
                       Container(
-                        constraints: const BoxConstraints(maxWidth: 400),
+                        constraints: const BoxConstraints(maxWidth: 500),
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -327,7 +327,7 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
                       )
                     ],
                     Container(
-                      constraints: const BoxConstraints(maxWidth: 400),
+                      constraints: const BoxConstraints(maxWidth: 500),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

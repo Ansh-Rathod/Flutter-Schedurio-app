@@ -102,20 +102,20 @@ class _GetAuthResultState extends State<GetAuthResult> {
                                     AppConfig.hiveKeys.authSecretToken,
                                     data.authTokenSecret),
                                 // keeping user data
-                                LocalCache.currentUser.put(
-                                    AppConfig.hiveKeys.username,
-                                    data.user!.screenName),
-                                LocalCache.currentUser.put(
-                                    AppConfig.hiveKeys.displayName,
-                                    data.user!.name),
-                                LocalCache.currentUser.put(
-                                    AppConfig.hiveKeys.profilePicture,
-                                    data.user!.thumbnailImage),
-                                LocalCache.currentUser.put(
-                                    AppConfig.hiveKeys.userId,
-                                    data.user!.id.toString()),
-                                LocalCache.currentUser.put(
-                                    AppConfig.hiveKeys.email, data.user!.email),
+                                // LocalCache.currentUser.put(
+                                //     AppConfig.hiveKeys.username,
+                                //     data.user!.screenName),
+                                // LocalCache.currentUser.put(
+                                //     AppConfig.hiveKeys.displayName,
+                                //     data.user!.name),
+                                // LocalCache.currentUser.put(
+                                //     AppConfig.hiveKeys.profilePicture,
+                                //     data.user!.thumbnailImage),
+                                // LocalCache.currentUser.put(
+                                //     AppConfig.hiveKeys.userId,
+                                //     data.user!.id.toString()),
+                                // LocalCache.currentUser.put(
+                                //     AppConfig.hiveKeys.email, data.user!.email),
 
                                 // keeping walk through status
                                 LocalCache.currentUser.put(

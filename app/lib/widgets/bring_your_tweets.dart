@@ -2,12 +2,15 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/config.dart';
 import 'package:schedurio/services/hive_cache.dart';
+import 'package:schedurio/services/twitter_api/twitter_api_base.dart';
 import 'package:schedurio/widgets/blurry_container.dart';
+import 'package:schedurio_utils/schedurio_utils.dart';
 
 import '../animations/delayed_animation.dart';
-import '../apis/get_tweets.dart';
+import '../supabase.dart';
 
 class GetTweetsWidget extends StatefulWidget {
   final Function onNext;
@@ -22,6 +25,7 @@ class GetTweetsWidget extends StatefulWidget {
 
 class _GetTweetsWidgetState extends State<GetTweetsWidget> {
   bool showButton = false;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return BlurryContainer(
@@ -31,7 +35,7 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
           AnimatedTextKit(
             animatedTexts: [
               FadeAnimatedText(
-                'Hurray! 🎉',
+                'Hurray! 🎉 ${LocalCache.currentUser.get(AppConfig.hiveKeys.displayName)}!',
                 textStyle: const TextStyle(
                   fontSize: 32.0,
                   color: Colors.black,
@@ -39,7 +43,7 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
                 ),
               ),
               FadeAnimatedText(
-                'Let\'s bring your old tweets!',
+                'Let\'s get your old tweets, for anylitics.',
                 fadeInEnd: 0.8,
                 fadeOutBegin: 0.9,
                 textStyle: const TextStyle(
@@ -69,29 +73,98 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
               slidingBeginOffset: const Offset(0, 1),
               delay: const Duration(milliseconds: 100),
               child: CupertinoButton.filled(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text(
-                      "Get my old tweets",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_sharp,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ],
-                ),
+                child: isLoading
+                    ? const ProgressCircle(
+                        value: null,
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text(
+                            "Proceed",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_sharp,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
                 onPressed: () async {
-                  for (var i = 0; i < 5; i++) {
-                    final tweets = await GetTweets.fromServer(i);
+                  setState(() {
+                    isLoading = true;
+                  });
+                  try {
+                    var pageinationToken;
+                    for (var i = 0; i < 5; i++) {
+                      final tweets = await TwitterApi.getTweets(
+                        apiKey: LocalCache.twitterApi
+                            .get(AppConfig.hiveKeys.apiKey),
+                        apiSecretKey: LocalCache.twitterApi
+                            .get(AppConfig.hiveKeys.apiSecretKey),
+                        oauthToken: LocalCache.twitterApi
+                            .get(AppConfig.hiveKeys.authToken),
+                        tokenSecret: LocalCache.twitterApi
+                            .get(AppConfig.hiveKeys.authSecretToken),
+                        userId: LocalCache.currentUser
+                            .get(AppConfig.hiveKeys.userId),
+                        pageinationToken: pageinationToken,
+                      );
+                      if (tweets['meta'].containsKey('next_token')) {
+                        pageinationToken = tweets['meta']['next_token'];
+                      } else {
+                        break;
+                      }
+                      final tweetModels =
+                          ConvertTwitterResponse.toTweetModel(tweets);
+                      for (var tweet in tweetModels) {
+                        await supabase.from('tweets').insert(tweet.toJson());
+                        await LocalCache.tweets.put(tweet.id, tweet.toJson());
+                      }
+                    }
+                    setState(() {
+                      isLoading = false;
+                    });
+                  } catch (e) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    if (!context.mounted) return;
+                    showMacosAlertDialog(
+                      barrierDismissible: true,
+                      context: context,
+                      builder: (_) => MacosAlertDialog(
+                        appIcon: const FlutterLogo(
+                          size: 56,
+                        ),
+                        title: Text(
+                          'Something went wrong!',
+                          style: MacosTheme.of(context).typography.headline,
+                        ),
+                        message: Text(
+                          'Something went wrong while Getting your tweets.',
+                          textAlign: TextAlign.center,
+                          style: MacosTheme.of(context).typography.headline,
+                        ),
+                        primaryButton: PushButton(
+                          buttonSize: ButtonSize.large,
+                          child: const Text('Try again?'),
+                          onPressed: () async {
+                            await LocalCache.currentUser.put(
+                                AppConfig.hiveKeys.walkThrough, 'authenticate');
+                            widget.onNext.call();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    );
                   }
                   await LocalCache.currentUser
-                      .put(AppConfig.hiveKeys.walkThrough, 'done');
+                      .put(AppConfig.hiveKeys.walkThrough, 'posting_schedule');
                   widget.onNext();
                 },
               ),

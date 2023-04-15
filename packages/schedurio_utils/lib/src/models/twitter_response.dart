@@ -2,12 +2,12 @@ import '../../schedurio_utils.dart';
 
 class ConvertTwitterResponse {
   static List<TweetModel> toTweetModel(dynamic data) {
-    final tweets = data['data'] as List<Map<String, dynamic>>;
+    final tweets = data['data'] as List<dynamic>;
     final media = (data['includes'] as Map).containsKey('media')
-        ? (data['includes'] as Map)['media'] as List<Map<String, dynamic>>
+        ? (data['includes'] as Map)['media'] as List<dynamic>
         : [];
     final polls = (data['includes'] as Map).containsKey('polls')
-        ? (data['includes'] as Map)['polls'] as List<Map<String, dynamic>>
+        ? (data['includes'] as Map)['polls'] as List<dynamic>
         : [];
 
     final alltweets = [];

@@ -23,10 +23,9 @@ enum TwitterLoginStatus {
 
 ///
 class TwitterLogin {
-  final String apiKey = 'E6LGuEE3S3TPFGxZ76FoVBMgE';
-  final String apiSecretKey =
-      'B4ORZMSmIkhnzorvtmzaJGK4iwghcI5i371kYAV0Y8J8mT3FDm';
-  final String redirectURI = 'http://localhost:3000/api/auth/callback/twitter';
+  final String apiKey = '';
+  final String apiSecretKey = '';
+  final String redirectURI = '';
 
   /// Logs the user
   /// Forces the user to enter their credentials to ensure the correct users account is authorized.

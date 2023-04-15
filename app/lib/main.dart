@@ -21,6 +21,7 @@ import 'package:window_size/window_size.dart';
 import 'config.dart';
 import 'screens/queue_screen/queue_screen.dart';
 import 'screens/settings/settings_screen.dart';
+import 'screens/walk_through/walk_through_screen.dart';
 import 'services/hive_cache.dart';
 
 void main() async {
@@ -52,10 +53,15 @@ class SchedurioApp extends StatelessWidget {
             darkTheme: MacosThemeData.dark(),
             themeMode: state.mode,
             debugShowCheckedModeBanner: false,
-            // home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
-            // ? const AppLayout()
-            // : const WalkThroughScreen(),
-            home: const AppLayout(),
+            home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) ==
+                    'done'
+                ? const AppLayout()
+                : WalkThroughScreen(
+                    onDone: () {
+                      BlocProvider.of<ThemeProviderCubit>(context).onDone();
+                    },
+                  ),
+            // home: const AppLayout(),
           );
         },
       ),

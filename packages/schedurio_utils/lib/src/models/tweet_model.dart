@@ -17,11 +17,12 @@ class TweetModel {
     return TweetModel(
       id: json['id'] as String,
       authorId: json['author_id'] as String,
-      content: json['content'] as String,
+      content: json['content'] ?? json['text'] as String,
       scrapedAt: json['scraped_at'] != null
           ? DateTime.parse(json['scraped_at'] as String)
           : DateTime.now(),
-      postedAt: DateTime.parse(json['posted_at'] as String),
+      postedAt:
+          DateTime.parse(json['posted_at'] ?? json['created_at'] as String),
       publicMetrics: PublicMetrics.fromJson(
         json['public_metrics'] as dynamic,
       ),

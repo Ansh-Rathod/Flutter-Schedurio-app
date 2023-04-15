@@ -33,7 +33,7 @@ class HistoryTweetWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 600),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: status == 'error' ? Border.all(color: Colors.red) : null,

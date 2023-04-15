@@ -7,6 +7,10 @@ class ThemeProviderCubit extends Cubit<ThemeProviderState> {
   ThemeProviderCubit() : super(ThemeProviderState.initial());
 
   void setTheme(ThemeMode mode) {
-    emit(ThemeProviderState(mode: mode));
+    emit(ThemeProviderState(mode: mode, onDone: false));
+  }
+
+  void onDone() {
+    emit(state.copyWith(onDone: true));
   }
 }

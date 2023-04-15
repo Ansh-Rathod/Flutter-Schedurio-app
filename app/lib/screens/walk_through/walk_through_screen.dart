@@ -1,18 +1,20 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:schedurio/animations/delayed_animation.dart';
 import 'package:schedurio/config.dart';
-import 'package:schedurio/main.dart';
+import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 import 'package:schedurio/services/hive_cache.dart';
-import 'package:schedurio/widgets/authentication.dart';
 
 import '../../widgets/about_walk_through.dart';
 import '../../widgets/bring_your_tweets.dart';
 import '../../widgets/get_api_keys.dart';
-import '../../widgets/get_auth_result.dart';
 
 class WalkThroughScreen extends StatefulWidget {
-  const WalkThroughScreen({super.key});
+  final Function() onDone;
+  const WalkThroughScreen({
+    Key? key,
+    required this.onDone,
+  }) : super(key: key);
 
   @override
   State<WalkThroughScreen> createState() => _WalkThroughScreenState();
@@ -71,28 +73,45 @@ class _WalkThroughScreenState extends State<WalkThroughScreen> {
           if (walkThrough == null) {
             return AboutWalkThrough(
               onNext: () {
-                Navigator.pushReplacement(
-                    context, createRoute(const AppLayout()));
+                setState(() {});
               },
             );
           } else if (walkThrough == 'api_keys') {
             return GetApiKeys(
               onNext: () => setState(() {}),
             );
-          } else if (walkThrough == 'authenticate') {
-            return Authenticate(
-              onNext: () => setState(() {}),
-            );
-          } else if (walkThrough == 'get_auth_result') {
-            return GetAuthResult(
-              onNext: () => setState(() {}),
-            );
+            // } else if (walkThrough == 'authenticate') {
+            //   return Authenticate(
+            //     onNext: () => setState(() {}),
+            //   );
+            // } else if (walkThrough == 'get_auth_result') {
+            //   return GetAuthResult(
+            //     onNext: () => setState(() {}),
+            //   );
           } else if (walkThrough == 'tweets') {
             return GetTweetsWidget(
               onNext: () => setState(() {}),
             );
+          } else if (walkThrough == 'posting_schedule') {
+            return Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              height: MediaQuery.of(context).size.height,
+              child: Center(
+                child: PostingScheduleWidget(
+                  onNext: () async {
+                    await LocalCache.currentUser
+                        .put(AppConfig.hiveKeys.walkThrough, 'done');
+                    setState(() {
+                      widget.onDone();
+                    });
+                  },
+                ),
+              ),
+            );
+          } else if (walkThrough == 'done') {
+            return Container();
           }
-          return Container();
+          return const SizedBox();
         }),
       ),
     );

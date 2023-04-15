@@ -7,7 +7,11 @@ import '../../widgets/expandable_list.dart';
 import 'cubit/posting_schedule_cubit_cubit.dart';
 
 class PostingScheduleWidget extends StatefulWidget {
-  const PostingScheduleWidget({super.key});
+  final Function()? onNext;
+  const PostingScheduleWidget({
+    Key? key,
+    this.onNext,
+  }) : super(key: key);
 
   @override
   State<PostingScheduleWidget> createState() => _PostingScheduleWidgetState();
@@ -285,6 +289,9 @@ class _PostingScheduleWidgetState extends State<PostingScheduleWidget> {
                                     BlocProvider.of<PostingScheduleCubit>(
                                             context)
                                         .save();
+                                    if (widget.onNext != null) {
+                                      widget.onNext?.call();
+                                    }
                                   },
                                   child: const Text('Done'),
                                 ),
