@@ -6,6 +6,24 @@ class AppConfig {
 
   /// hive box names
   static final hiveBoxNames = HiveBoxNames();
+
+  /// UrLS
+  static const String version = '1.0.0-beta';
+
+  ///
+  static const String gitHubRepoUrl =
+      'https://github.com/Ansh-Rathod/schedurio';
+  static const String myWebsite = 'https://anshrathod.com';
+  static const String schedurioWeb = 'https://schedurio.anshrathod.com';
+  static const String contributionUrl =
+      'https://github.com/Ansh-Rathod/schedurio/contribute.md';
+  static const String issuesUrl =
+      'https://github.com/Ansh-Rathod/schedurio/issues';
+  static const String email = 'mailto:anshrathodfr@gmail.com';
+  static const String github = 'https://github.com/Ansh-Rathod';
+  static const String twitter = 'https://twitter.com/anshrathodfr';
+  static const String linkedIn = 'https://www.linkedin.com/in/anshrathodfr/';
+  static const String instagram = 'https://www.instagram.com/anshrathodfr/';
 }
 
 /// hive keys class

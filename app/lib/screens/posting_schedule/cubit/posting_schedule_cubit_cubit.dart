@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:schedurio/helpers.dart';
 
 import '../../../models/posting_schedule.dart';
 import '../../../services/hive_cache.dart';
@@ -11,6 +12,27 @@ class PostingScheduleCubit extends Cubit<PostingScheduleState> {
 
   void changeTime(TimeOfDay time) {
     emit(state.copyWith(time: time));
+  }
+
+  void init() {
+    try {
+      List<PostingSchedule> schedule = [];
+      for (int i = 0; i < 7; i++) {
+        if (LocalCache.schedule.get(getDayOfWeek(i)) != null) {
+          final times = LocalCache.schedule.get(getDayOfWeek(i)).toList();
+          schedule.add(PostingSchedule.fromJson({
+            'day': getDayOfWeek(i),
+            'times': times,
+          }));
+        }
+
+        if (schedule.isNotEmpty) {
+          emit(state.copyWith(schedule: schedule));
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   void changeAddAt(String? addAt) {

@@ -138,10 +138,19 @@ class _QueueScreenState extends State<QueueScreen> {
                                                     children: [
                                                       Text(
                                                         e.time.format(context),
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           fontSize: 14,
+                                                          color: MacosTheme
+                                                                      .brightnessOf(
+                                                                          context) ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors
+                                                                  .grey.shade400
+                                                              : Colors.grey
+                                                                  .shade700,
                                                           fontWeight:
-                                                              FontWeight.w600,
+                                                              FontWeight.w400,
                                                         ),
                                                       ),
                                                       const SizedBox(

@@ -148,15 +148,17 @@ class _TweetWidgetState extends State<TweetWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
+              TextButton(
+                onPressed: () {
                   launchUrlString(
                       'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/${widget.tweet.id}');
                 },
-                child: const Text("View on Twitter",
-                    style: TextStyle(
-                      color: Colors.blue,
-                    )),
+                child: const Text(
+                  "View on Twitter",
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
               ),
               Row(
                 children: [

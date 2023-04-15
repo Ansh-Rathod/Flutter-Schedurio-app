@@ -5,23 +5,24 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
 
 import '../models/queue_tweets.dart';
-import '../screens/edit_tweet/edit_tweet.dart';
 import 'image_widget/image.dart';
 
-class QueueDraftTweet extends StatelessWidget {
+class HistoryTweetWidget extends StatelessWidget {
   final List<QueueTweetModel> tweets;
   final int id;
   final Function(List<QueueTweetModel> tweets) onEdit;
   final Function() onPostNow;
+  final String status;
   final Function(int id) onDelete;
   final Function(int id) onAddToQueue;
 
-  const QueueDraftTweet({
+  const HistoryTweetWidget({
     Key? key,
     required this.tweets,
     required this.id,
     required this.onEdit,
     required this.onPostNow,
+    required this.status,
     required this.onDelete,
     required this.onAddToQueue,
   }) : super(key: key);
@@ -35,6 +36,7 @@ class QueueDraftTweet extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 500),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
+          border: status == 'error' ? Border.all(color: Colors.red) : null,
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           color: MacosTheme.of(context).dividerColor,
         ),
@@ -50,84 +52,92 @@ class QueueDraftTweet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      "${date.formatedString()} ${TimeOfDay(hour: date.hour, minute: date.minute).format(context)}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xffa0a0a0),
-                      )),
+                    "${date.formatedString()} ${TimeOfDay(hour: date.hour, minute: date.minute).format(context)}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          MacosTheme.brightnessOf(context) == Brightness.light
+                              ? const Color.fromARGB(255, 31, 29, 29)
+                              : const Color.fromARGB(255, 183, 182, 182),
+                    ),
+                  ),
                   Row(
                     children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final updatedTweets = await showMacosSheet(
-                              barrierDismissible: true,
-                              context: context,
-                              builder: (_) => MacosSheet(
-                                    child: EditTweet(
-                                      isDraft: id,
-                                      tweets:
-                                          tweets.map((e) => e.copy()).toList(),
-                                      selected: DateTime.now().toUtc(),
-                                    ),
-                                  ));
-
-                          if (updatedTweets != null) {
-                            onEdit.call(updatedTweets);
-                          }
-                        },
-                        child: Container(
+                      if (status == 'posted')
+                        TextButton(
+                          onPressed: () {
+                            // launchUrlString(
+                            // 'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/');
+                          },
+                          child: const Text(
+                            "View on Twitter",
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      if (status == 'error') ...[
+                        TextButton(
+                          onPressed: () {
+                            // launchUrlString(
+                            // 'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/');
+                          },
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.error,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                              SizedBox(
+                                width: 4,
+                              ),
+                              Text(
+                                "Failed",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                   color: MacosTheme.of(context).dividerColor)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: MacosTheme.brightnessOf(context) ==
-                                      Brightness.dark
-                                  ? Colors.grey.shade300
-                                  : MacosColors.black,
-                            ),
+                          child: MacosPulldownButton(
+                            icon: CupertinoIcons.ellipsis,
+                            items: [
+                              MacosPulldownMenuItem(
+                                onTap: () {
+                                  onPostNow.call();
+                                },
+                                title: const Text("Post now"),
+                              ),
+                              MacosPulldownMenuItem(
+                                onTap: () {
+                                  onAddToQueue.call(id);
+                                },
+                                title: const Text("Add to Queue"),
+                              ),
+                              const MacosPulldownMenuDivider(),
+                              MacosPulldownMenuItem(
+                                onTap: () {
+                                  onDelete.call(id);
+                                },
+                                title: const Text("Delete"),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                                color: MacosTheme.of(context).dividerColor)),
-                        child: MacosPulldownButton(
-                          icon: CupertinoIcons.ellipsis,
-                          items: [
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onPostNow.call();
-                              },
-                              title: const Text("Post now"),
-                            ),
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onAddToQueue.call(id);
-                              },
-                              title: const Text("Add to Queue"),
-                            ),
-                            const MacosPulldownMenuDivider(),
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onDelete.call(id);
-                              },
-                              title: const Text("Delete"),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ]
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -176,8 +186,8 @@ class QueueDraftTweet extends StatelessWidget {
                                         color:
                                             MacosTheme.brightnessOf(context) ==
                                                     Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black87,
+                                                ? Colors.white54
+                                                : Colors.black54,
                                         fontSize: 14,
                                       ),
                                     ),

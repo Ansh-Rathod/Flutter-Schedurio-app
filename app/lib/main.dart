@@ -6,17 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:schedurio/screens/about/about_screen.dart';
 import 'package:schedurio/screens/analytics/analytics_screen.dart';
 import 'package:schedurio/screens/create_tweet/create_tweet.dart';
 import 'package:schedurio/screens/create_tweet/cubit/create_tweet_cubit.dart';
 import 'package:schedurio/screens/drafts/cubit/drafts_screen_cubit.dart';
 import 'package:schedurio/screens/drafts/drafts_screen.dart';
+import 'package:schedurio/screens/history/history_screen.dart';
 import 'package:schedurio/screens/posting_schedule/posting_schedule.dart';
 import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
+import 'package:schedurio/theme/cubit/theme_provider_cubit.dart';
 import 'package:window_size/window_size.dart';
 
 import 'config.dart';
 import 'screens/queue_screen/queue_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'services/hive_cache.dart';
 
 void main() async {
@@ -38,16 +42,23 @@ class SchedurioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MacosApp(
-      title: 'Schedurio',
-      theme: MacosThemeData.light(),
-      darkTheme: MacosThemeData.dark(),
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      // home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
-      // ? const AppLayout()
-      // : const WalkThroughScreen(),
-      home: const AppLayout(),
+    return BlocProvider(
+      create: (context) => ThemeProviderCubit(),
+      child: BlocBuilder<ThemeProviderCubit, ThemeProviderState>(
+        builder: (context, state) {
+          return MacosApp(
+            title: 'Schedurio',
+            theme: MacosThemeData.light(),
+            darkTheme: MacosThemeData.dark(),
+            themeMode: state.mode,
+            debugShowCheckedModeBanner: false,
+            // home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
+            // ? const AppLayout()
+            // : const WalkThroughScreen(),
+            home: const AppLayout(),
+          );
+        },
+      ),
     );
   }
 }
@@ -78,9 +89,9 @@ class _AppLayoutState extends State<AppLayout> {
       child: const DraftsScreen(),
     ),
     const AnalyticScreen(),
-    Container(),
-    Container(),
-    Container(),
+    const HistoryScreen(),
+    const AboutScreen(),
+    const SettingsScreen(),
   ];
 
   @override
@@ -144,8 +155,8 @@ class _AppLayoutState extends State<AppLayout> {
                 label: Text('History'),
               ),
               const SidebarItem(
-                leading: MacosIcon(CupertinoIcons.star),
-                label: Text('Favorites'),
+                leading: MacosIcon(CupertinoIcons.info_circle),
+                label: Text('About'),
               ),
               const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.settings),

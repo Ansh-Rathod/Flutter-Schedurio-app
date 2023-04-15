@@ -13,39 +13,39 @@ class PostingScheduleState {
 
   factory PostingScheduleState.initial() {
     return PostingScheduleState(
-      addAt: 'All',
-      time: TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute),
-      schedule: [
-        PostingSchedule(day: 'Monday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Tuesday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Wednesday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Thursday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Friday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Saturday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-        PostingSchedule(day: 'Sunday', times: [
-          const TimeOfDay(hour: 10, minute: 18),
-          const TimeOfDay(hour: 13, minute: 12),
-        ]),
-      ],
-    );
+        addAt: 'All',
+        time:
+            TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute),
+        schedule: [
+          PostingSchedule(day: 'Monday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Tuesday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Wednesday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Thursday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Friday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Saturday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+          PostingSchedule(day: 'Sunday', times: [
+            const TimeOfDay(hour: 10, minute: 18),
+            const TimeOfDay(hour: 13, minute: 12),
+          ]),
+        ]);
   }
 
   PostingScheduleState copyWith({
