@@ -2,6 +2,13 @@
 
 An open-source Tweet scheduler app for Twitter content creators. Built with [supabase](https://supabase.com/) and flutter.
 
+# Team details
+
+Solo Participate.
+
+- [@Ansh-Rathod](https://github.com/Ansh-Rathod) on github Only.
+- [@anshrathodfr](https://twitter.com/anshrathodfr) on twitter.
+
 ## About the app.
 
 The app is very helpful for Twitter content creators who are paying monthly for services like Hypefury, Feedhive, and many others, now they can use the Schedurio open-source app on their desktop by adding their own API keys. currently available for the Macos and web.
