@@ -11,11 +11,10 @@ class AppConfig {
   static const String version = '1.0.0-beta';
 
   ///
-  static const String supabaseUrl = 'https://ymqribzzaqwkxsfervlb.supabase.co';
+  static const String supabaseUrl = 'https://<project ref>.supabase.co';
   static const String postTweetEdgeUrl =
-      "https://ymbpdhtwplsosapftgvv.functions.supabase.co/dart_edge";
-  static const String supabaseToken =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltYnBkaHR3cGxzb3NhcGZ0Z3Z2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MTcwMjc4MSwiZXhwIjoxOTk3Mjc4NzgxfQ.i3b7x54X57zriIPnTZ8Sgfp8YA15jOySu5DodVAiAbM";
+      "https://<project ref>.functions.supabase.co/dart_edge";
+  static const String supabaseToken = "<service role jwt>";
 
   ///
   static const String gitHubRepoUrl =
