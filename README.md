@@ -26,6 +26,9 @@ NOTE: link to hosted demo is not available because it is an open-source project 
 
 ## Demo video
 
+
+https://user-images.githubusercontent.com/67627096/232454769-b99192f9-35c2-42e0-98ea-ffef5f05af3a.mp4
+
 # Use of supabase
 
 The app has wide use of the supabase. services the app uses of supabase.
@@ -71,6 +74,9 @@ in order to run the app make you have all the requirements on your machine.
 ## important links
 
 [https://developer.twitter.com/en/portal/dashboard](https://developer.twitter.com/en/portal/dashboard)
+
+
+
 
 [POST media/upload](https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-upload)
 
