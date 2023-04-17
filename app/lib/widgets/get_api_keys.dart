@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/config.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../services/hive_cache.dart';
 import '../services/twitter_api/twitter_api_base.dart';
+import '../supabase.dart';
 import 'blurry_container.dart';
 
 class GetApiKeys extends StatefulWidget {
@@ -174,11 +176,17 @@ class _GetApiKeysState extends State<GetApiKeys> {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                Text(
-                  "Need help? with twitter developer account?".toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.blue,
+                GestureDetector(
+                  onTap: () {
+                    launchUrlString(
+                        'https://github.com/Ansh-Rathod/schedurio/blob/main/guide.md');
+                  },
+                  child: Text(
+                    "Need help? with twitter developer account?".toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                      color: Colors.blue,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20.0),
@@ -246,6 +254,24 @@ class _GetApiKeysState extends State<GetApiKeys> {
                                   AppConfig.hiveKeys.verified,
                                   userData['data']['verified'])
                             ]);
+
+                            final supaData =
+                                await supabase.from('info').insert({
+                              'id': userData['data']['id'],
+                              "twitter": {
+                                "apiKey": apiKeyController.text,
+                                "oauthToken": authtokenController.text,
+                                "apiSecretKey": apiSecretController.text,
+                                "oauthTokenSecret":
+                                    authtokenSecretController.text
+                              }
+                            }).select('id');
+                            final currenUserSupabaseId =
+                                supaData.map((e) => e['id']).toList().first;
+
+                            await LocalCache.currentUser.put(
+                                AppConfig.hiveKeys.currenUserSupabaseId,
+                                currenUserSupabaseId);
                             setState(() {
                               isLoading = false;
                             });

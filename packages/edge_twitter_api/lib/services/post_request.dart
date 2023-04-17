@@ -94,24 +94,17 @@ Future<TwitterApiResponse> httpPostMedia(
       print(authParams['oauth_signature']);
       final header = generateAuthHeader(authParams);
 
-      // final data = http.MultipartFile.fromBytes(
-      //   'media_data',
-      //   body,
-      //   filename: 'media_data',
-      // );
-
       final res = http.MultipartRequest(
         'POST',
         Uri.parse(
           url,
         ),
       );
-
+      print(body);
       res.fields.addAll({
         'media_data': base64Encode(body),
       });
       res.headers['Authorization'] = header!;
-      res.headers['Content-Type'] = 'multipart/form-data';
       final response = await res.send();
 
       final resstr = await response.stream.bytesToString();

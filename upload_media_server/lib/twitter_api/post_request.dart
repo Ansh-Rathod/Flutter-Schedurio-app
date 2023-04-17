@@ -1,9 +1,10 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-
-import 'signature.dart';
+import 'package:upload_media_server/twitter_api/signature.dart';
 
 ///
 String? generateAuthHeader(Map<String, dynamic> params) {
@@ -24,7 +25,7 @@ Future<dynamic> httpGet(
       url: url,
       params: authParams,
       apiKey: apiKey,
-      method: "GET",
+      method: 'GET',
       apiSecretKey: apiSecretKey,
       tokenSecretKey: tokenSecret,
     );
@@ -39,7 +40,7 @@ Future<dynamic> httpGet(
     );
 
     if (res.statusCode != 200) {
-      return {"statusCode": res.statusCode, "message": res.reasonPhrase};
+      return {'statusCode': res.statusCode, 'message': res.reasonPhrase};
     }
     return jsonDecode(res.body);
   } catch (e) {
@@ -47,6 +48,7 @@ Future<dynamic> httpGet(
   }
 }
 
+/// uploads media to twitter
 Future<dynamic> httpPostMedia(
   String url,
   Uint8List body,
@@ -92,19 +94,19 @@ Future<dynamic> httpPostMedia(
     if (response.statusCode != 200) {
       print(resstr);
       return {
-        "statusCode": response.statusCode,
+        'statusCode': response.statusCode,
         'message': response.reasonPhrase,
       };
     }
     final mediaId = jsonDecode(resstr)['media_id'];
     return {
-      "statusCode": 200,
+      'statusCode': 200,
       'id': mediaId,
       'message': 'Done',
     };
   } catch (e) {
     return {
-      "statusCode": 500,
+      'statusCode': 500,
       'message': 'INTERNAL SERVER ERROR',
     };
   }

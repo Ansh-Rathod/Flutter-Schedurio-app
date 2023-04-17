@@ -1,7 +1,7 @@
 /// Support for doing something awesome.
 ///
 /// More dartdocs go here.
-library twitter_api;
+library edge_twitter_api;
 
 export 'models/signature.dart';
 export 'src/service.dart';

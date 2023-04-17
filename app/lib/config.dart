@@ -11,6 +11,13 @@ class AppConfig {
   static const String version = '1.0.0-beta';
 
   ///
+  static const String supabaseUrl = 'https://ymqribzzaqwkxsfervlb.supabase.co';
+  static const String postTweetEdgeUrl =
+      "https://ymbpdhtwplsosapftgvv.functions.supabase.co/dart_edge";
+  static const String supabaseToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltYnBkaHR3cGxzb3NhcGZ0Z3Z2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MTcwMjc4MSwiZXhwIjoxOTk3Mjc4NzgxfQ.i3b7x54X57zriIPnTZ8Sgfp8YA15jOySu5DodVAiAbM";
+
+  ///
   static const String gitHubRepoUrl =
       'https://github.com/Ansh-Rathod/schedurio';
   static const String myWebsite = 'https://anshrathod.com';
@@ -34,6 +41,8 @@ class HiveKeys {
 
   /// NOTE:only use in currentUser box
   final String userId = 'userId';
+
+  final String currenUserSupabaseId = 'currenUserSupabaseId';
 
   /// NOTE:only use in currentUser box
   final String displayName = 'displayName';

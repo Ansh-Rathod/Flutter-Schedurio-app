@@ -11,9 +11,10 @@ dependencies:
   supabase_functions: ^0.0.1
   edge_http_client: ^0.0.1+1
   supabase: ^1.6.3
+  http: any
   yet_another_json_isolate: ^1.0.3
-  twitter_api:
-    path: ../../packages/twitter_api
+  edge_twitter_api:
+    path: ../../packages/edge_twitter_api
 
 dev_dependencies:
   lints: ^2.0.1

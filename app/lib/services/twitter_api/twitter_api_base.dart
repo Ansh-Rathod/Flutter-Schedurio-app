@@ -1,5 +1,8 @@
-import 'package:schedurio/services/twitter_api/post_request.dart';
+import 'dart:typed_data';
+
 import 'package:schedurio/services/twitter_api/signature.dart';
+
+import 'post_request.dart';
 
 class TwitterApi {
   static Future<dynamic> getAuthUser({
@@ -19,6 +22,30 @@ class TwitterApi {
       tokenSecret,
     );
     return res;
+  }
+
+  static String uploadMediaUrl =
+      'https://upload.twitter.com/1.1/media/upload.json';
+
+  static Future<dynamic> uploadMedia({
+    required String apiKey,
+    required String apiSecretKey,
+    required String oauthToken,
+    required String tokenSecret,
+    required Uint8List body,
+    required String mediaType,
+  }) async {
+    return await httpPostMedia(
+      '$uploadMediaUrl?media_category=$mediaType',
+      body,
+      requestHeader(
+        apiKey: apiKey,
+        oauthToken: oauthToken,
+      ),
+      apiKey,
+      apiSecretKey,
+      tokenSecret,
+    );
   }
 
   static Future<dynamic> getTweets(

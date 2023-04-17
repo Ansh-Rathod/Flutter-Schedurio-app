@@ -5,9 +5,11 @@ import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:path/path.dart' as path;
 import 'package:schedurio/models/queue_tweets.dart';
+import 'package:schedurio/services/twitter_api/twitter_api_base.dart';
 import 'package:schedurio/widgets/image_widget/image.dart';
 
 import '../config.dart';
@@ -42,7 +44,7 @@ class CreateTweetWidget extends StatefulWidget {
 
 class _CreateTweetWidgetState extends State<CreateTweetWidget> {
   bool isDragging = false;
-  void onFilesPick(List<String> paths) {
+  void onFilesPick(List<String> paths) async {
     if (widget.media.length + paths.length > 4) {
       showAlert(context);
     } else if ((widget.media.map((e) => e.path).toList() + paths)
@@ -98,6 +100,21 @@ class _CreateTweetWidgetState extends State<CreateTweetWidget> {
           widget.onMediaChange(distinctList);
         });
       }
+
+      // print('downloading');
+      // final mediaIntList = await http.get(Uri.parse(
+      //     'https://ymqribzzaqwkxsfervlb.supabase.co/storage/v1/object/public/public/tweet_image/f61704e1-192a-41f7-9126-0315108ea230_chatgpts-response-after-regenrating-it-for-fifth-time.jpeg'));
+      // print('downloaded');
+
+      // await TwitterApi.uploadMedia(
+      //   apiKey: LocalCache.twitterApi.get(AppConfig.hiveKeys.apiKey),
+      //   apiSecretKey:
+      //       LocalCache.twitterApi.get(AppConfig.hiveKeys.apiSecretKey),
+      //   oauthToken: LocalCache.twitterApi.get(AppConfig.hiveKeys.authToken),
+      //   tokenSecret:
+      //       LocalCache.twitterApi.get(AppConfig.hiveKeys.authSecretToken),
+      //   body: mediaIntList.bodyBytes,
+      // );
     }
   }
 

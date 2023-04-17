@@ -5,6 +5,7 @@ import 'package:schedurio/helpers.dart';
 import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/supabase.dart';
 
+import '../../../config.dart';
 import '../../../models/queue_tweets.dart';
 
 part 'create_tweet_state.dart';
@@ -73,14 +74,31 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         }
       }
 
-      await supabase.from('queue').insert({
+      final supaQueue = await supabase.from('queue').insert({
         "tweets": state.tweets.map((e) => e.toJson()).toList(),
         "scheduled_at": state.selected.toUtc().toString(),
         "status": "pending",
         "cron_text": dateTimeToCron(state.selected),
         "cron_media":
             dateTimeToCron(state.selected.subtract(const Duration(minutes: 10)))
+      }).select('id');
+      final queueId = supaQueue.map((e) => e['id']).toList().first;
+
+// name TEXT, expression TEXT,queue_id INTEGER, user_id INTEGER,headers_input TEXT,url TEXT,body TEXT
+      await supabase.rpc('schedule_tweet_post', params: {
+        'name':
+            'queue-$queueId-${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}',
+        'expression': dateTimeToCron(state.selected),
+        'queue_id': queueId,
+        'user_id':
+            LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId),
+        'headers_input':
+            '{"Content-Type": "application/json", "Authorization": "Bearer ${LocalCache.currentUser.get(AppConfig.supabaseToken)}"}',
+        'url': AppConfig.postTweetEdgeUrl,
+        'body':
+            '{"queueId": $queueId, "userId": "${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}"}'
       });
+
       final id =
           removeLastFourZeros(state.selected.toUtc().millisecondsSinceEpoch);
       print(id);
@@ -115,6 +133,7 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
       await supabase.from('drafts').insert({
         "tweets": state.tweets.map((e) => e.toJson()).toList(),
       });
+
       print("saved");
       emit(state.copyWith(status: CreateTweetStatus.success));
       emit(CreateTweetState.initial());

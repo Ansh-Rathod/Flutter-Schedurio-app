@@ -105,6 +105,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.4+1"
+  edge_twitter_api:
+    dependency: "direct main"
+    description:
+      path: "../../packages/edge_twitter_api"
+      relative: true
+    source: path
+    version: "1.0.0"
   file:
     dependency: transitive
     description:
@@ -154,7 +161,7 @@ packages:
     source: hosted
     version: "3.0.6"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "6aa2946395183537c8b880962d935877325d6a09a2867c3970c05c0fed6ac482"
@@ -425,13 +432,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.1"
-  twitter_api:
-    dependency: "direct main"
-    description:
-      path: "../../packages/twitter_api"
-      relative: true
-    source: path
-    version: "1.0.0"
   typed_data:
     dependency: transitive
     description:
