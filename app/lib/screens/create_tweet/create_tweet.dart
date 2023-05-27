@@ -55,7 +55,7 @@ class _CreateTweetState extends State<CreateTweet> {
               builder: (context, state) {
                 return Container(
                   color: MacosTheme.of(context).canvasColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Column(
                     children: [
                       Expanded(
@@ -176,8 +176,14 @@ class _CreateTweetState extends State<CreateTweet> {
                                                   color: Colors.white,
                                                   fontSize: 14),
                                             )
-                                          : const ProgressCircle(
-                                              value: null,
+                                          : CupertinoActivityIndicator(
+                                              color: MacosTheme.brightnessOf(
+                                                          context) ==
+                                                      Brightness.dark
+                                                  ? const Color.fromARGB(
+                                                      255, 228, 228, 232)
+                                                  : const Color.fromARGB(
+                                                      255, 59, 58, 58),
                                             )),
                                   CustomMacosPulldownButton(items: [
                                     CustomMacosPulldownMenuItem(

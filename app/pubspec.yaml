@@ -27,6 +27,7 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+
 dependencies:
   flutter:
     sdk: flutter
@@ -49,14 +50,17 @@ dependencies:
   file_picker: ^5.2.7
   flutter_bloc: ^8.1.2
   intl: ^0.18.0
+  emoji_picker:
+    path: ../packages/emoji_picker
   extended_image: ^7.0.2
+  flutter_staggered_grid_view: any
+  twitter_api:
+    path: ../packages/twitter_api
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git
       path: plugins/window_size
   uuid: ^3.0.7
-  twitter_api:
-    path: ../packages/twitter_api
 
 dev_dependencies:
   flutter_test:

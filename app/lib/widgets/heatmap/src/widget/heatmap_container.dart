@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
-import '../data/heatmap_color.dart';
-
 class HeatMapContainer extends StatelessWidget {
   final DateTime date;
   final int number;
@@ -47,7 +45,8 @@ class HeatMapContainer extends StatelessWidget {
           child: InkWell(
             child: Container(
               decoration: BoxDecoration(
-                color: backgroundColor ?? Color.fromARGB(255, 73, 97, 121),
+                color:
+                    backgroundColor ?? const Color.fromARGB(255, 73, 97, 121),
                 borderRadius:
                     BorderRadius.all(Radius.circular(borderRadius ?? 5)),
               ),

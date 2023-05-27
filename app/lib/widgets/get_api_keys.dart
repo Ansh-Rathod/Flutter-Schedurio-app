@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/config.dart';
+import 'package:twitter_api/twitter_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../services/hive_cache.dart';
-import '../services/twitter_api/twitter_api_base.dart';
 import '../supabase.dart';
 import 'blurry_container.dart';
 
@@ -227,16 +227,17 @@ class _GetApiKeysState extends State<GetApiKeys> {
                             LocalCache.twitterApi.put(
                                 AppConfig.hiveKeys.authSecretToken,
                                 authtokenSecretController.text),
-                            LocalCache.currentUser
-                                .put(AppConfig.hiveKeys.walkThrough, 'tweets')
+                            LocalCache.currentUser.put(
+                                AppConfig.hiveKeys.walkThrough,
+                                'posting_schedule')
                           ]);
                           try {
                             final userData = await TwitterApi.getAuthUser(
-                                apiKey: apiKeyController.text,
-                                apiSecretKey: apiSecretController.text,
-                                oauthToken: authtokenController.text,
-                                tokenSecret: authtokenSecretController.text);
-
+                              apiKey: apiKeyController.text,
+                              apiSecretKey: apiSecretController.text,
+                              oauthToken: authtokenController.text,
+                              tokenSecret: authtokenSecretController.text,
+                            );
                             await Future.wait([
                               LocalCache.currentUser.put(
                                   AppConfig.hiveKeys.username,
@@ -257,7 +258,6 @@ class _GetApiKeysState extends State<GetApiKeys> {
 
                             final supaData =
                                 await supabase.from('info').insert({
-                              'id': userData['data']['id'],
                               "twitter": {
                                 "apiKey": apiKeyController.text,
                                 "oauthToken": authtokenController.text,
@@ -268,7 +268,7 @@ class _GetApiKeysState extends State<GetApiKeys> {
                             }).select('id');
                             final currenUserSupabaseId =
                                 supaData.map((e) => e['id']).toList().first;
-
+                            //TODO: breackpoint
                             await LocalCache.currentUser.put(
                                 AppConfig.hiveKeys.currenUserSupabaseId,
                                 currenUserSupabaseId);
@@ -277,6 +277,7 @@ class _GetApiKeysState extends State<GetApiKeys> {
                             });
                             widget.onNext.call();
                           } catch (e) {
+                            print(e);
                             setState(() {
                               isLoading = false;
                             });
@@ -316,7 +317,12 @@ class _GetApiKeysState extends State<GetApiKeys> {
                       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                       buttonSize: ButtonSize.small,
                       child: isLoading
-                          ? const ProgressCircle(value: null)
+                          ? CupertinoActivityIndicator(
+                              color: MacosTheme.brightnessOf(context) ==
+                                      Brightness.dark
+                                  ? const Color.fromARGB(255, 228, 228, 232)
+                                  : const Color.fromARGB(255, 59, 58, 58),
+                            )
                           : const Text("Next"),
                     ),
                   ],

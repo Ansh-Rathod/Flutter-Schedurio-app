@@ -22,7 +22,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       toolBar: ToolBar(
         height: 45,
         title: const Text(
-          "Drafts",
+          "History",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -51,8 +51,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: BlocBuilder<HistoryScreenCubit, HistoryScreenState>(
                 builder: (context, state) {
                   if (state.status == FetchTweetsStatus.loading) {
-                    return const Center(
-                      child: ProgressCircle(value: null),
+                    return Center(
+                      child: CupertinoActivityIndicator(
+                        color:
+                            MacosTheme.brightnessOf(context) == Brightness.dark
+                                ? const Color.fromARGB(255, 228, 228, 232)
+                                : const Color.fromARGB(255, 59, 58, 58),
+                      ),
                     );
                   }
                   if (state.status == FetchTweetsStatus.error) {
@@ -89,6 +94,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         const SizedBox(
                           height: 20,
                         ),
+                        if (state.tweets.isEmpty)
+                          const Center(
+                            child: Text("Nothing to see here!"),
+                          ),
                         ...state.tweets.map(
                           (e) => HistoryTweetWidget(
                             tweets: e['tweets'],

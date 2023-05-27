@@ -885,7 +885,7 @@ class _CustomMacosPulldownButtonState extends State<CustomMacosPulldownButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonHeight = _hasIcon ? 28.0 : 20.0;
+    // final buttonHeight = _hasIcon ? 28.0 : 20.0;
     final borderRadius = _hasIcon
         ? const BorderRadius.all(Radius.circular(7.0))
         : _kBorderRadius;
@@ -1102,7 +1102,7 @@ class _DownCaretPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const radius = 4.0;
+    // const radius = 4.0;
     final hPadding = size.height / 3;
 
     /// Draw background

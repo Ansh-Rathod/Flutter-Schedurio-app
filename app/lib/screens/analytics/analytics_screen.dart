@@ -26,7 +26,7 @@ class AnalyticScreenState extends State<AnalyticScreen> {
       toolBar: ToolBar(
         height: 45,
         title: const Text(
-          "Analytics",
+          "Overview",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -124,10 +124,7 @@ class AnalyticScreenState extends State<AnalyticScreen> {
                                           ),
                                           MacosPulldownMenuItem(
                                             title: const Text('Share'),
-                                            onTap: () {
-                                              print(
-                                                  LocalCache.twitterApi.values);
-                                            },
+                                            onTap: () {},
                                           ),
                                           const MacosPulldownMenuDivider(),
                                           MacosPulldownMenuItem(

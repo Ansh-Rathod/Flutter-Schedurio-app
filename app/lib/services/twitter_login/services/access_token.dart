@@ -23,7 +23,6 @@ class AccessToken {
       oauthToken: queries['oauth_token'],
       oauthVerifier: queries['oauth_verifier'],
     );
-    print("getting access token");
     final params = await httpPost(
       ACCESS_TOKEN_URI,
       authParams,

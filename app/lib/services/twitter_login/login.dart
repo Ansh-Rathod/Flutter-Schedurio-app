@@ -46,7 +46,6 @@ class TwitterLogin {
       );
     }
 
-    print("requestToken.authorizeURI: ${requestToken.authorizeURI}");
     final uri = Uri.parse(requestToken.authorizeURI);
     launchUrl(uri);
   }
@@ -73,7 +72,6 @@ class TwitterLogin {
       queries,
     );
     // http: //localhost:3000/api/auth/callback/twitter?oauth_token=S4BlMwAAAAABgmYjAAABh2ChkiI&oauth_verifier=W8aE57hkPiQECvVColuKWETBuEvANEsa
-    print(token.userId);
     if ((token.authToken?.isEmpty ?? true) ||
         (token.authTokenSecret?.isEmpty ?? true)) {
       return AuthResult(

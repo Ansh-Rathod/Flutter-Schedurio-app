@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -192,8 +193,14 @@ class EditTweet extends StatelessWidget {
                                                     color: Colors.white,
                                                     fontSize: 14),
                                               )
-                                            : const ProgressCircle(
-                                                value: null,
+                                            : CupertinoActivityIndicator(
+                                                color: MacosTheme.brightnessOf(
+                                                            context) ==
+                                                        Brightness.dark
+                                                    ? const Color.fromARGB(
+                                                        255, 228, 228, 232)
+                                                    : const Color.fromARGB(
+                                                        255, 59, 58, 58),
                                               )),
                                     if (isDraft == null)
                                       CustomMacosPulldownButton(items: [

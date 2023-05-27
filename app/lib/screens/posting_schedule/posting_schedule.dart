@@ -38,6 +38,13 @@ class _PostingScheduleWidgetState extends State<PostingScheduleWidget> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
+                          border: MacosTheme.brightnessOf(context) ==
+                                  Brightness.dark
+                              ? Border.all(
+                                  color: const Color.fromARGB(255, 69, 69, 71))
+                              : Border.all(
+                                  color:
+                                      const Color.fromARGB(255, 225, 224, 224)),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           color: MacosTheme.brightnessOf(context) !=

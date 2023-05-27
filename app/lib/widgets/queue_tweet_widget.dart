@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../models/queue_tweets.dart';
 import '../screens/edit_tweet/edit_tweet.dart';
-import 'image_widget/image.dart';
+import 'image_widget/_image_web.dart';
 
 class QueueDraftTweet extends StatelessWidget {
   final List<QueueTweetModel> tweets;
@@ -35,8 +36,13 @@ class QueueDraftTweet extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 600),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
+          border: MacosTheme.brightnessOf(context) == Brightness.dark
+              ? Border.all(color: const Color.fromARGB(255, 69, 69, 71))
+              : Border.all(color: const Color.fromARGB(255, 225, 224, 224)),
           borderRadius: const BorderRadius.all(Radius.circular(10)),
-          color: MacosTheme.of(context).dividerColor,
+          color: MacosTheme.brightnessOf(context) != Brightness.dark
+              ? const Color(0xfff1f0f5)
+              : const Color(0xff2e2e2e),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,12 +146,9 @@ class QueueDraftTweet extends StatelessWidget {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: MacosTheme.brightnessOf(context) !=
-                                    Brightness.dark
-                                ? const Color(0xfff1f0f5)
-                                : const Color(0xff2e2e2e),
+                            color: MacosTheme.of(context).canvasColor,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
+                                const BorderRadius.all(Radius.circular(5)),
                           ),
                           padding: const EdgeInsets.all(10),
                           child: Row(
@@ -205,28 +208,58 @@ class QueueDraftTweet extends StatelessWidget {
                                                   child: Stack(
                                                     children: [
                                                       Container(
-                                                        width: 120,
-                                                        height: 120,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          color: MacosTheme.of(
-                                                                  context)
-                                                              .dividerColor,
-                                                        ),
-                                                        child: file.type ==
-                                                                'video'
-                                                            ? Container()
-                                                            : file.path == null
-                                                                ? ImageWidget(
-                                                                    imgFile: file
-                                                                        .url!)
-                                                                : ImageWidget(
-                                                                    imgFile: file
-                                                                        .path!),
-                                                      ),
+                                                          width: 120,
+                                                          height: 120,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: MacosTheme
+                                                                    .of(context)
+                                                                .dividerColor,
+                                                          ),
+                                                          child: file.type ==
+                                                                  'tweet_video'
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    if (file.url !=
+                                                                        null) {
+                                                                      launchUrlString(
+                                                                          file.url!);
+                                                                    } else if (file
+                                                                            .path !=
+                                                                        null) {
+                                                                      launchUrlString(
+                                                                          "file:///Users/${file.path!.split("Users")[1]}");
+                                                                    }
+                                                                  },
+                                                                  child: SizedBox(
+                                                                      width: 120,
+                                                                      height: 120,
+                                                                      child: Center(
+                                                                        child:
+                                                                            Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Text(
+                                                                            "Tap to view in video browser".toUpperCase(),
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 10,
+                                                                              color: Colors.grey.shade200,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      )),
+                                                                )
+                                                              : ImageWidget(
+                                                                  imgFile: file
+                                                                      .url!)),
                                                       Positioned(
                                                         bottom: 5,
                                                         left: 5,
@@ -245,7 +278,13 @@ class QueueDraftTweet extends StatelessWidget {
                                                                 const EdgeInsets
                                                                     .all(4.0),
                                                             child: Text(
-                                                              file.type,
+                                                              file.type ==
+                                                                      'tweet_video'
+                                                                  ? 'VID'
+                                                                  : file.type ==
+                                                                          'tweet_image'
+                                                                      ? 'IMG'
+                                                                      : 'GIF',
                                                               style: const TextStyle(
                                                                   color: Colors
                                                                       .white,
@@ -279,13 +318,9 @@ class QueueDraftTweet extends StatelessWidget {
                               height: 20,
                               width: 5,
                               decoration: BoxDecoration(
-                                // borderRadius:
-                                //     const BorderRadius.all(Radius.circular(10)),
-                                color: MacosTheme.brightnessOf(context) !=
-                                        Brightness.dark
-                                    ? const Color(0xfff1f0f5)
-                                    : const Color(0xff2e2e2e),
-                              ),
+                                  // borderRadius:
+                                  //     const BorderRadius.all(Radius.circular(10)),
+                                  color: MacosTheme.of(context).canvasColor),
                             ),
                           )
                         else

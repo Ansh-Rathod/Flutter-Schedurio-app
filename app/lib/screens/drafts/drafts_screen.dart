@@ -48,8 +48,12 @@ class _DraftsScreenState extends State<DraftsScreen> {
             child: BlocBuilder<DraftsScreenCubit, DraftsScreenState>(
               builder: (context, state) {
                 if (state.status == FetchTweetsStatus.loading) {
-                  return const Center(
-                    child: ProgressCircle(value: null),
+                  return Center(
+                    child: CupertinoActivityIndicator(
+                      color: MacosTheme.brightnessOf(context) == Brightness.dark
+                          ? const Color.fromARGB(255, 228, 228, 232)
+                          : const Color.fromARGB(255, 59, 58, 58),
+                    ),
                   );
                 }
                 if (state.status == FetchTweetsStatus.error) {
@@ -85,6 +89,10 @@ class _DraftsScreenState extends State<DraftsScreen> {
                       const SizedBox(
                         height: 20,
                       ),
+                      if (state.tweets.isEmpty)
+                        const Center(
+                          child: Text("No drafts found!"),
+                        ),
                       ...state.tweets.map(
                         (e) => QueueDraftTweet(
                           tweets: e['tweets'],

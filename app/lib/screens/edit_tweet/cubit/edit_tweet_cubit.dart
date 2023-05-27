@@ -90,7 +90,8 @@ class EditTweetCubit extends Cubit<EditTweetState> {
         for (var media in tweet.media) {
           if (media.path != null) {
             final url = await supabase.storage.from('public').upload(
-                "${media.type}/${tweet.id}_${media.name}", File(media.path!));
+                "${media.type}/${tweet.id}_${media.name.replaceAll(' ', '')}",
+                File(media.path!));
             media.url = "${supabase.storageUrl}/object/public/$url";
           }
         }

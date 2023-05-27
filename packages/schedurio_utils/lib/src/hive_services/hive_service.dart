@@ -107,9 +107,6 @@ class HiveStorageImplementation<E> implements HiveContract<E> {
 
   @override
   Future<void> remove(dynamic key) async {
-    print(key);
-    print(key is int);
-    print(key is String);
     _guard();
     await _box.delete(key);
   }

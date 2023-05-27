@@ -80,15 +80,18 @@ class _WalkThroughScreenState extends State<WalkThroughScreen> {
             return GetApiKeys(
               onNext: () => setState(() {}),
             );
-            // } else if (walkThrough == 'authenticate') {
-            //   return Authenticate(
-            //     onNext: () => setState(() {}),
-            //   );
-            // } else if (walkThrough == 'get_auth_result') {
-            //   return GetAuthResult(
-            //     onNext: () => setState(() {}),
-            //   );
-          } else if (walkThrough == 'tweets') {
+          }
+          //  else if (walkThrough == 'authenticate') {
+          //   return Authenticate(
+          //     onNext: () => setState(() {}),
+          //   );
+          // }
+          // else if (walkThrough == 'get_auth_result') {
+          //   return GetAuthResult(
+          //     onNext: () => setState(() {}),
+          //   );
+          // }
+          else if (walkThrough == 'tweets') {
             return GetTweetsWidget(
               onNext: () => setState(() {}),
             );

@@ -16,7 +16,14 @@ class QueueScreenCubit extends Cubit<QueueScreenState> {
       final tweets = await supabase
           .from('queue')
           .select('tweets,scheduled_at')
-          .eq('status', 'pending');
+          .gt(
+              'scheduled_at',
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+              ).toUtc().toString())
+          .order('scheduled_at');
 
       final List<dynamic> encoded = tweets.map((e) {
         final list = (e['tweets'] as List)
@@ -29,7 +36,6 @@ class QueueScreenCubit extends Cubit<QueueScreenState> {
         };
         return map;
       }).toList();
-      print(encoded);
       final queue = await createQueueList(encoded);
       emit(
         state.copyWith(

@@ -45,6 +45,13 @@ class AboutScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Container(
                       decoration: BoxDecoration(
+                        border: MacosTheme.brightnessOf(context) ==
+                                Brightness.dark
+                            ? Border.all(
+                                color: const Color.fromARGB(255, 69, 69, 71))
+                            : Border.all(
+                                color:
+                                    const Color.fromARGB(255, 225, 224, 224)),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
                         color:
@@ -107,6 +114,13 @@ class AboutScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Container(
                       decoration: BoxDecoration(
+                        border: MacosTheme.brightnessOf(context) ==
+                                Brightness.dark
+                            ? Border.all(
+                                color: const Color.fromARGB(255, 69, 69, 71))
+                            : Border.all(
+                                color:
+                                    const Color.fromARGB(255, 225, 224, 224)),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
                         color:
@@ -183,6 +197,13 @@ class AboutScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Container(
                       decoration: BoxDecoration(
+                        border: MacosTheme.brightnessOf(context) ==
+                                Brightness.dark
+                            ? Border.all(
+                                color: const Color.fromARGB(255, 69, 69, 71))
+                            : Border.all(
+                                color:
+                                    const Color.fromARGB(255, 225, 224, 224)),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
                         color:
@@ -218,6 +239,15 @@ class AboutScreen extends StatelessWidget {
                                       )),
                                 ],
                               ),
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            const AboutListTile(
+                              subtitle:
+                                  'Join our discord server for feature requests and bug reports.',
+                              title: 'Discord',
+                              url: AppConfig.discordLink,
                             ),
                             const SizedBox(
                               height: 12,

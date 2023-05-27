@@ -62,19 +62,20 @@ in order to run the app make you have all the requirements on your machine.
 
 **Requirements**
 
-- git installed
+- Git installed
 - supabase cli.
+- Twitter developer account.
 - supabase account.
 - docker (only if you like to test them on the localhost)
 - flutter stable (3.7.9)
 
 **Brief steps.**
 
-- clone the repo.
-- deploy supabase.
-- create bucket named `public` in supabase storage.
-- add supabase URL and **service key in the app/lib/config.dart file**
-- hit the flutter run.
+- Clone the repo.
+- Deploy supabase.
+- Create bucket named `public` in supabase storage.
+- Add supabase URL and **service key in the app/lib/config.dart file**
+- Hit the flutter run.
 
 # Setup video
 

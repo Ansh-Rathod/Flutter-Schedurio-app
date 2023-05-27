@@ -67,10 +67,12 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
       // await LocalCache.queue.clear();
       for (var tweet in state.tweets) {
         for (var media in tweet.media) {
-          final url = await supabase.storage.from('public').upload(
-              "${media.type}/${tweet.id}_${media.name}", File(media.path!));
-
-          media.url = "${supabase.storageUrl}/object/public/$url";
+          if (media.path != null) {
+            final url = await supabase.storage.from('public').upload(
+                "${media.type}/${tweet.id}_${media.name.replaceAll(' ', '')}",
+                File(media.path!));
+            media.url = "${supabase.storageUrl}/object/public/$url";
+          }
         }
       }
 
@@ -82,9 +84,9 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         "cron_media":
             dateTimeToCron(state.selected.subtract(const Duration(minutes: 10)))
       }).select('id');
+
       final queueId = supaQueue.map((e) => e['id']).toList().first;
 
-// name TEXT, expression TEXT,queue_id INTEGER, user_id INTEGER,headers_input TEXT,url TEXT,body TEXT
       await supabase.rpc('schedule_tweet_post', params: {
         'name':
             'queue-$queueId-${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}',
@@ -94,18 +96,15 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
             LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId),
         'headers_input':
             '{"Content-Type": "application/json", "Authorization": "Bearer ${LocalCache.currentUser.get(AppConfig.supabaseToken)}"}',
-        'url': AppConfig.postTweetEdgeUrl,
+        'url': AppConfig.postTweetUrl,
         'body':
             '{"queueId": $queueId, "userId": "${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}"}'
       });
 
       final id =
           removeLastFourZeros(state.selected.toUtc().millisecondsSinceEpoch);
-      print(id);
       await LocalCache.filledQueue.put(id, id);
       await LocalCache.queue.put(id, id);
-
-      print('added to queue');
 
       emit(state.copyWith(status: CreateTweetStatus.success));
       emit(CreateTweetState.initial());
@@ -134,7 +133,6 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         "tweets": state.tweets.map((e) => e.toJson()).toList(),
       });
 
-      print("saved");
       emit(state.copyWith(status: CreateTweetStatus.success));
       emit(CreateTweetState.initial());
       init();

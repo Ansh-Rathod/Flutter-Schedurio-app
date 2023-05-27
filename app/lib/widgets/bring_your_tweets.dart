@@ -5,12 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/config.dart';
 import 'package:schedurio/services/hive_cache.dart';
-import 'package:schedurio/services/twitter_api/twitter_api_base.dart';
 import 'package:schedurio/widgets/blurry_container.dart';
-import 'package:schedurio_utils/schedurio_utils.dart';
 
 import '../animations/delayed_animation.dart';
-import '../supabase.dart';
 
 class GetTweetsWidget extends StatefulWidget {
   final Function onNext;
@@ -43,7 +40,7 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
                 ),
               ),
               FadeAnimatedText(
-                'Let\'s get your old tweets, for anylitics.',
+                'Let\'s get your old tweets.',
                 fadeInEnd: 0.8,
                 fadeOutBegin: 0.9,
                 textStyle: const TextStyle(
@@ -74,8 +71,11 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
               delay: const Duration(milliseconds: 100),
               child: CupertinoButton.filled(
                 child: isLoading
-                    ? const ProgressCircle(
-                        value: null,
+                    ? CupertinoActivityIndicator(
+                        color:
+                            MacosTheme.brightnessOf(context) == Brightness.dark
+                                ? const Color.fromARGB(255, 228, 228, 232)
+                                : const Color.fromARGB(255, 59, 58, 58),
                       )
                     : Row(
                         mainAxisSize: MainAxisSize.min,
@@ -99,33 +99,34 @@ class _GetTweetsWidgetState extends State<GetTweetsWidget> {
                     isLoading = true;
                   });
                   try {
-                    var pageinationToken;
-                    for (var i = 0; i < 5; i++) {
-                      final tweets = await TwitterApi.getTweets(
-                        apiKey: LocalCache.twitterApi
-                            .get(AppConfig.hiveKeys.apiKey),
-                        apiSecretKey: LocalCache.twitterApi
-                            .get(AppConfig.hiveKeys.apiSecretKey),
-                        oauthToken: LocalCache.twitterApi
-                            .get(AppConfig.hiveKeys.authToken),
-                        tokenSecret: LocalCache.twitterApi
-                            .get(AppConfig.hiveKeys.authSecretToken),
-                        userId: LocalCache.currentUser
-                            .get(AppConfig.hiveKeys.userId),
-                        pageinationToken: pageinationToken,
-                      );
-                      if (tweets['meta'].containsKey('next_token')) {
-                        pageinationToken = tweets['meta']['next_token'];
-                      } else {
-                        break;
-                      }
-                      final tweetModels =
-                          ConvertTwitterResponse.toTweetModel(tweets);
-                      for (var tweet in tweetModels) {
-                        await supabase.from('tweets').insert(tweet.toJson());
-                        await LocalCache.tweets.put(tweet.id, tweet.toJson());
-                      }
-                    }
+                    // var pageinationToken;
+                    // for (var i = 0; i < 2; i++) {
+                    //   final tweets = await TwitterApi.getTweets(
+                    //     apiKey: LocalCache.twitterApi
+                    //         .get(AppConfig.hiveKeys.apiKey),
+                    //     apiSecretKey: LocalCache.twitterApi
+                    //         .get(AppConfig.hiveKeys.apiSecretKey),
+                    //     oauthToken: LocalCache.twitterApi
+                    //         .get(AppConfig.hiveKeys.authToken),
+                    //     tokenSecret: LocalCache.twitterApi
+                    //         .get(AppConfig.hiveKeys.authSecretToken),
+                    //     userId: LocalCache.currentUser
+                    //         .get(AppConfig.hiveKeys.userId),
+                    //     pageinationToken: pageinationToken,
+                    //   );
+                    //   if (tweets['meta'].containsKey('next_token')) {
+                    //     pageinationToken = tweets['meta']['next_token'];
+                    //   } else {
+                    //     break;
+                    //   }
+                    //   final tweetModels =
+                    //       ConvertTwitterResponse.toTweetModel(tweets);
+                    //   for (var tweet in tweetModels) {
+                    //     // await supabase.from('tweets').insert(tweet.toJson());
+                    //     await LocalCache.tweets.put(tweet.id, tweet.toJson());
+                    //   }
+                    // }
+
                     setState(() {
                       isLoading = false;
                     });

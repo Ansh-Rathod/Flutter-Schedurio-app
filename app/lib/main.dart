@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/screens/about/about_screen.dart';
-import 'package:schedurio/screens/analytics/analytics_screen.dart';
 import 'package:schedurio/screens/create_tweet/create_tweet.dart';
 import 'package:schedurio/screens/create_tweet/cubit/create_tweet_cubit.dart';
 import 'package:schedurio/screens/drafts/cubit/drafts_screen_cubit.dart';
@@ -27,6 +26,11 @@ import 'services/hive_cache.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalCache.init();
+
+  // await LocalCache.queue.clear();
+  // await LocalCache.filledQueue.clear();
+  // await LocalCache.schedule.clear();
+  // await LocalCache.currentUser.put(AppConfig.hiveKeys.walkThrough, null);
 
   if (!kIsWeb) {
     if (Platform.isMacOS || Platform.isWindows) {
@@ -94,7 +98,7 @@ class _AppLayoutState extends State<AppLayout> {
       create: (context) => DraftsScreenCubit()..init(),
       child: const DraftsScreen(),
     ),
-    const AnalyticScreen(),
+    // const AnalyticScreen(),
     const HistoryScreen(),
     const AboutScreen(),
     const SettingsScreen(),
@@ -104,9 +108,14 @@ class _AppLayoutState extends State<AppLayout> {
   Widget build(BuildContext context) {
     return MacosWindow(
       backgroundColor: const Color.fromARGB(255, 34, 32, 34),
-      titleBar: const TitleBar(
+      titleBar: TitleBar(
+        decoration: BoxDecoration(
+          color: MacosTheme.brightnessOf(context) != Brightness.dark
+              ? const Color(0xfff1f0f5)
+              : MacosTheme.of(context).canvasColor,
+        ),
         height: 35,
-        title: Text(
+        title: const Text(
           "Schedurio",
           style: TextStyle(fontSize: 14),
         ),
@@ -152,10 +161,10 @@ class _AppLayoutState extends State<AppLayout> {
                 leading: MacosIcon(CupertinoIcons.doc_plaintext),
                 label: Text('Drafts'),
               ),
-              const SidebarItem(
-                leading: MacosIcon(CupertinoIcons.graph_circle),
-                label: Text('Analytics'),
-              ),
+              // const SidebarItem(
+              //   leading: MacosIcon(CupertinoIcons.graph_circle),
+              //   label: Text('Overview'),
+              // ),
               const SidebarItem(
                 leading: MacosIcon(CupertinoIcons.clock),
                 label: Text('History'),

@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:extended_image/extended_image.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 class ImageWidget extends StatelessWidget {
@@ -32,7 +32,11 @@ class ImageWidget extends StatelessWidget {
           if (state.extendedImageLoadState == LoadState.loading) {
             return Container(
               color: MacosTheme.of(context).dividerColor,
-              child: const ProgressCircle(value: null),
+              child: CupertinoActivityIndicator(
+                color: MacosTheme.brightnessOf(context) == Brightness.dark
+                    ? const Color.fromARGB(255, 228, 228, 232)
+                    : const Color.fromARGB(255, 59, 58, 58),
+              ),
             );
           }
           return null;

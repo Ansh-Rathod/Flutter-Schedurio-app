@@ -8,13 +8,15 @@ class AppConfig {
   static final hiveBoxNames = HiveBoxNames();
 
   /// UrLS
-  static const String version = '1.0.0-beta';
+  static const String version = '1.0.1-beta';
 
   ///
-  static const String supabaseUrl = 'https://<project ref>.supabase.co';
-  static const String postTweetEdgeUrl =
-      "https://<project ref>.functions.supabase.co/dart_edge";
-  static const String supabaseToken = "<service role jwt>";
+  static const String supabaseUrl = '';
+
+  static const String supabaseToken = "";
+
+// Post tweeet BackendUrL
+  static const String postTweetUrl = "<<Hosted server url>>";
 
   ///
   static const String gitHubRepoUrl =
@@ -30,6 +32,7 @@ class AppConfig {
   static const String twitter = 'https://twitter.com/anshrathodfr';
   static const String linkedIn = 'https://www.linkedin.com/in/anshrathodfr/';
   static const String instagram = 'https://www.instagram.com/anshrathodfr/';
+  static const String discordLink = 'https://discord.gg/QcStXmWVSm';
 }
 
 /// hive keys class

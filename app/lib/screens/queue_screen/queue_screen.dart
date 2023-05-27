@@ -8,6 +8,7 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
 import 'package:schedurio/screens/queue_screen/cubit/queue_screen_cubit.dart';
 import 'package:schedurio/services/hive_cache.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../models/queue_tweets.dart';
 import '../../supabase.dart';
@@ -54,8 +55,13 @@ class _QueueScreenState extends State<QueueScreen> {
               child: BlocBuilder<QueueScreenCubit, QueueScreenState>(
                 builder: (context, state) {
                   if (state.status == FetchTweetsStatus.loading) {
-                    return const Center(
-                      child: ProgressCircle(value: null),
+                    return Center(
+                      child: CupertinoActivityIndicator(
+                        color:
+                            MacosTheme.brightnessOf(context) == Brightness.dark
+                                ? const Color.fromARGB(255, 228, 228, 232)
+                                : const Color.fromARGB(255, 59, 58, 58),
+                      ),
                     );
                   }
                   if (state.status == FetchTweetsStatus.error) {
@@ -117,6 +123,17 @@ class _QueueScreenState extends State<QueueScreen> {
                                                 vertical: 8.0),
                                             child: Container(
                                               decoration: BoxDecoration(
+                                                border: MacosTheme.brightnessOf(
+                                                            context) ==
+                                                        Brightness.dark
+                                                    ? Border.all(
+                                                        color: const Color
+                                                                .fromARGB(
+                                                            255, 69, 69, 71))
+                                                    : Border.all(
+                                                        color: const Color
+                                                                .fromARGB(255,
+                                                            225, 224, 224)),
                                                 borderRadius:
                                                     const BorderRadius.all(
                                                         Radius.circular(10)),
@@ -187,8 +204,21 @@ class _QueueScreenState extends State<QueueScreen> {
                                                   ),
                                                   Expanded(
                                                     child: e.tweets != null
-                                                        ? QueueTweetWidget(
-                                                            tweet: e.tweets![0],
+                                                        ? Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              ...e.tweets!
+                                                                  .map(
+                                                                    (tweet) =>
+                                                                        QueueTweetWidget(
+                                                                      tweet:
+                                                                          tweet,
+                                                                    ),
+                                                                  )
+                                                                  .toList()
+                                                            ],
                                                           )
                                                         : Container(),
                                                   ),
@@ -356,105 +386,160 @@ class QueueTweetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (tweet.content.isNotEmpty)
-                Flexible(
-                  child: Text(
-                    tweet.content,
-                    maxLines: 2,
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      color: MacosTheme.brightnessOf(context) == Brightness.dark
-                          ? Colors.white
-                          : Colors.black87,
-                      fontSize: 14,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: MacosTheme.of(context).canvasColor,
+      ),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (tweet.content.isNotEmpty)
+                  Flexible(
+                    child: Text(
+                      tweet.content,
+                      maxLines: 2,
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        color:
+                            MacosTheme.brightnessOf(context) == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                ),
-              if (tweet.media.isNotEmpty) ...[
-                if (tweet.content.isNotEmpty)
-                  const SizedBox(
-                    height: 10,
-                  ),
-                Container(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        for (var file in tweet.media)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: MacosTheme.of(context).dividerColor,
-                                  ),
-                                  child: file.type == 'video'
-                                      ? Container()
-                                      : ExtendedImage.network(
-                                          file.url!,
-                                          fit: BoxFit.cover,
-                                          loadStateChanged:
-                                              (ExtendedImageState state) {
-                                            if (state.extendedImageLoadState ==
-                                                LoadState.loading) {
-                                              return Container(
-                                                color: MacosTheme.of(context)
-                                                    .dividerColor,
-                                                child: const ProgressCircle(
-                                                    value: null),
-                                              );
-                                            }
-                                            return null;
-                                          },
-                                          shape: BoxShape.rectangle,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                ),
-                                Positioned(
-                                  bottom: 2,
-                                  left: 2,
-                                  child: Container(
+                if (tweet.media.isNotEmpty) ...[
+                  if (tweet.content.isNotEmpty)
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          for (var file in tweet.media)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
                                     decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(4)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text(
-                                        file.type,
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 8),
+                                      borderRadius: BorderRadius.circular(5),
+                                      color:
+                                          MacosTheme.of(context).dividerColor,
+                                    ),
+                                    child: file.type == 'tweet_video'
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              if (file.url != null) {
+                                                launchUrlString(file.url!);
+                                              } else if (file.path != null) {
+                                                launchUrlString(
+                                                    "file:///Users/${file.path!.split("Users")[1]}");
+                                              }
+                                            },
+                                            child: SizedBox(
+                                                width: 60,
+                                                height: 60,
+                                                child: Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Tap to view video in browser"
+                                                          .toUpperCase(),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 8,
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )),
+                                          )
+                                        : ExtendedImage.network(
+                                            file.url!,
+                                            fit: BoxFit.cover,
+                                            loadStateChanged:
+                                                (ExtendedImageState state) {
+                                              if (state
+                                                      .extendedImageLoadState ==
+                                                  LoadState.loading) {
+                                                return Container(
+                                                  color: MacosTheme.of(context)
+                                                      .dividerColor,
+                                                  child:
+                                                      CupertinoActivityIndicator(
+                                                    color: MacosTheme
+                                                                .brightnessOf(
+                                                                    context) ==
+                                                            Brightness.dark
+                                                        ? const Color.fromARGB(
+                                                            255, 228, 228, 232)
+                                                        : const Color.fromARGB(
+                                                            255, 59, 58, 58),
+                                                  ),
+                                                );
+                                              }
+                                              return null;
+                                            },
+                                            shape: BoxShape.rectangle,
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                  ),
+                                  Positioned(
+                                    bottom: 2,
+                                    left: 2,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(4)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Text(
+                                          file.type == 'tweet_video'
+                                              ? 'VID'
+                                              : file.type == 'tweet_image'
+                                                  ? 'IMG'
+                                                  : 'GIF',
+                                          style: const TextStyle(
+                                              color: Colors.white, fontSize: 8),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ]
-            ],
-          ),
-        )
-      ],
+                ]
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
