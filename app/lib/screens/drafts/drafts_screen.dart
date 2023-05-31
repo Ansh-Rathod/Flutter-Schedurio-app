@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/supabase.dart';
@@ -97,7 +100,66 @@ class _DraftsScreenState extends State<DraftsScreen> {
                         (e) => QueueDraftTweet(
                           tweets: e['tweets'],
                           id: e['id'],
-                          onAddToQueue: (int id) {},
+                          onPostNow: () async {
+                            final status =
+                                await BlocProvider.of<DraftsScreenCubit>(
+                                        context)
+                                    .postNow(e['id'].toString(), e['tweets']);
+                            if (status == 'error') {
+                              // ignore: use_build_context_synchronously
+                              showMacosAlertDialog(
+                                barrierDismissible: true,
+                                context: context,
+                                builder: (_) => MacosAlertDialog(
+                                  appIcon: const FlutterLogo(
+                                    size: 50,
+                                  ),
+                                  title: const Text(
+                                    "Error!!",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  message: const Text("Something went wrong"),
+                                  primaryButton: PushButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    buttonSize: ButtonSize.large,
+                                    child: const Text("OK"),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (status == 'success') {
+                              showMacosAlertDialog(
+                                barrierDismissible: true,
+                                context: context,
+                                builder: (_) => MacosAlertDialog(
+                                  appIcon: const Icon(
+                                    CupertinoIcons.check_mark_circled_solid,
+                                    color: Colors.green,
+                                    size: 50,
+                                  ),
+                                  title: const Text(
+                                    "Posted!!",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  message: const Text(
+                                      "Your tweet has been posted successfully."),
+                                  primaryButton: PushButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    buttonSize: ButtonSize.large,
+                                    child: const Text("OK"),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                           onDelete: (int id) async {
                             BlocProvider.of<DraftsScreenCubit>(context)
                                 .removeTweet(id);
@@ -108,7 +170,65 @@ class _DraftsScreenState extends State<DraftsScreen> {
                               e['tweets'] = tweets;
                             });
                           },
-                          onPostNow: () {},
+                          onAddToQueue: (int id) async {
+                            final status = await BlocProvider.of<
+                                    DraftsScreenCubit>(context)
+                                .addToQueue(e['id'].toString(), e['tweets']);
+                            if (status == 'error') {
+                              // ignore: use_build_context_synchronously
+                              showMacosAlertDialog(
+                                barrierDismissible: true,
+                                context: context,
+                                builder: (_) => MacosAlertDialog(
+                                  appIcon: const FlutterLogo(
+                                    size: 50,
+                                  ),
+                                  title: const Text(
+                                    "Error!!",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  message: const Text("Something went wrong"),
+                                  primaryButton: PushButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    buttonSize: ButtonSize.large,
+                                    child: const Text("OK"),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (status == 'success') {
+                              showMacosAlertDialog(
+                                barrierDismissible: true,
+                                context: context,
+                                builder: (_) => MacosAlertDialog(
+                                  appIcon: const Icon(
+                                    CupertinoIcons.check_mark_circled_solid,
+                                    color: Colors.green,
+                                    size: 50,
+                                  ),
+                                  title: const Text(
+                                    "Added!!",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  message: const Text(
+                                      "Your tweet has been Scheduled successfully."),
+                                  primaryButton: PushButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    buttonSize: ButtonSize.large,
+                                    child: const Text("OK"),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ],

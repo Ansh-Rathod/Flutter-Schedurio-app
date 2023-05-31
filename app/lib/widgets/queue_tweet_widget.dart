@@ -9,11 +9,11 @@ import '../models/queue_tweets.dart';
 import '../screens/edit_tweet/edit_tweet.dart';
 import 'image_widget/_image_web.dart';
 
-class QueueDraftTweet extends StatelessWidget {
+class QueueDraftTweet extends StatefulWidget {
   final List<QueueTweetModel> tweets;
   final int id;
   final Function(List<QueueTweetModel> tweets) onEdit;
-  final Function() onPostNow;
+  final Future Function() onPostNow;
   final Function(int id) onDelete;
   final Function(int id) onAddToQueue;
 
@@ -28,8 +28,14 @@ class QueueDraftTweet extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<QueueDraftTweet> createState() => _QueueDraftTweetState();
+}
+
+class _QueueDraftTweetState extends State<QueueDraftTweet> {
+  bool isLoading = false;
+  @override
   Widget build(BuildContext context) {
-    final date = DateTime.parse(tweets.first.createdAt).toLocal();
+    final date = DateTime.parse(widget.tweets.first.createdAt).toLocal();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -70,15 +76,16 @@ class QueueDraftTweet extends StatelessWidget {
                               context: context,
                               builder: (_) => MacosSheet(
                                     child: EditTweet(
-                                      isDraft: id,
-                                      tweets:
-                                          tweets.map((e) => e.copy()).toList(),
+                                      isDraft: widget.id,
+                                      tweets: widget.tweets
+                                          .map((e) => e.copy())
+                                          .toList(),
                                       selected: DateTime.now().toUtc(),
                                     ),
                                   ));
 
                           if (updatedTweets != null) {
-                            onEdit.call(updatedTweets);
+                            widget.onEdit.call(updatedTweets);
                           }
                         },
                         child: Container(
@@ -102,36 +109,61 @@ class QueueDraftTweet extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                                color: MacosTheme.of(context).dividerColor)),
-                        child: MacosPulldownButton(
-                          icon: CupertinoIcons.ellipsis,
-                          items: [
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onPostNow.call();
-                              },
-                              title: const Text("Post now"),
-                            ),
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onAddToQueue.call(id);
-                              },
-                              title: const Text("Add to Queue"),
-                            ),
-                            const MacosPulldownMenuDivider(),
-                            MacosPulldownMenuItem(
-                              onTap: () {
-                                onDelete.call(id);
-                              },
-                              title: const Text("Delete"),
-                            ),
-                          ],
+                      if (!isLoading)
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                  color: MacosTheme.of(context).dividerColor)),
+                          child: MacosPulldownButton(
+                            icon: CupertinoIcons.ellipsis,
+                            items: [
+                              MacosPulldownMenuItem(
+                                onTap: () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await widget.onPostNow.call();
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                },
+                                title: const Text("Post now"),
+                              ),
+                              MacosPulldownMenuItem(
+                                onTap: () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await widget.onAddToQueue.call(widget.id);
+
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                },
+                                title: const Text("Add to Queue"),
+                              ),
+                              const MacosPulldownMenuDivider(),
+                              MacosPulldownMenuItem(
+                                onTap: () {
+                                  widget.onDelete.call(widget.id);
+                                },
+                                title: const Text("Delete"),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                      if (isLoading)
+                        Container(
+                            height: 30,
+                            width: 50,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color:
+                                        MacosTheme.of(context).dividerColor)),
+                            child: const Center(
+                                child: CupertinoActivityIndicator()))
                     ],
                   ),
                 ],
@@ -140,7 +172,7 @@ class QueueDraftTweet extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            ...tweets
+            ...widget.tweets
                 .map((tweet) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -159,7 +191,7 @@ class QueueDraftTweet extends StatelessWidget {
                                 decoration:
                                     const BoxDecoration(shape: BoxShape.circle),
                                 child: Text(
-                                  "${tweets.indexOf(tweet) + 1}",
+                                  "${widget.tweets.indexOf(tweet) + 1}",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Color(0xffa0a0a0),
@@ -310,7 +342,8 @@ class QueueDraftTweet extends StatelessWidget {
                             ],
                           ),
                         ),
-                        if (tweets.indexOf(tweet) != tweets.length - 1)
+                        if (widget.tweets.indexOf(tweet) !=
+                            widget.tweets.length - 1)
                           Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 16.0),

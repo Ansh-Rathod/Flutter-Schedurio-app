@@ -138,6 +138,7 @@ Future<List<QueueModel>> createQueueList(List<dynamic> tweets) async {
         orElse: () => null,
       );
       allTimes.add(QueueDayTime(
+          id: tweetsOnTime != null ? tweetsOnTime['id'].toString() : "",
           time: time,
           fullDate: date,
           tweets: tweetsOnTime != null ? tweetsOnTime['tweets'] : null));

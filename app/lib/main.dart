@@ -52,23 +52,53 @@ class SchedurioApp extends StatelessWidget {
       child: BlocBuilder<ThemeProviderCubit, ThemeProviderState>(
         builder: (context, state) {
           return MacosApp(
-            title: 'Schedurio',
-            theme: MacosThemeData.light(),
-            darkTheme: MacosThemeData.dark(),
-            themeMode: state.mode,
-            debugShowCheckedModeBanner: false,
-            home: LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) ==
-                    'done'
-                ? const AppLayout()
-                : WalkThroughScreen(
-                    onDone: () {
-                      BlocProvider.of<ThemeProviderCubit>(context).onDone();
-                    },
-                  ),
-            // home: const AppLayout(),
-          );
+              title: 'Schedurio',
+              theme: MacosThemeData.light(),
+              darkTheme: MacosThemeData.dark(),
+              themeMode: state.mode,
+              debugShowCheckedModeBanner: false,
+              home: const SchedurioHome()
+              // home: const AppLayout(),
+              );
         },
       ),
+    );
+  }
+}
+
+class SchedurioHome extends StatefulWidget {
+  const SchedurioHome({super.key});
+
+  static void restartApp(BuildContext context) {
+    context.findAncestorStateOfType<_SchedurioHomeState>()!.reBuild();
+  }
+
+  @override
+  State<SchedurioHome> createState() => _SchedurioHomeState();
+}
+
+class _SchedurioHomeState extends State<SchedurioHome> {
+  Key key = UniqueKey();
+
+  void reBuild() {
+    setState(() {
+      key = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: key,
+      child:
+          LocalCache.currentUser.get(AppConfig.hiveKeys.walkThrough) == 'done'
+              ? const AppLayout()
+              : WalkThroughScreen(
+                  onDone: () {
+                    reBuild();
+                    BlocProvider.of<ThemeProviderCubit>(context).onDone();
+                  },
+                ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:schedurio/helpers.dart';
 import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/supabase.dart';
 
+import '../../../apis/tweet_api.dart';
 import '../../../config.dart';
 import '../../../models/queue_tweets.dart';
 
@@ -14,9 +15,6 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
   CreateTweetCubit() : super(CreateTweetState.initial());
 
   void init() async {
-    // await LocalCache.filledQueue.clear();
-    // await LocalCache.queue.clear();
-
     final queue = await getAvailableQueue()
       ..sort();
     List<DateTime> availableTimes = [];
@@ -60,7 +58,9 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
     emit(state.copyWith(tweets: state.tweets));
   }
 
-  void onAddToQueue() async {
+  void postNow() async {
+    int mediaCount = 0;
+
     try {
       emit(state.copyWith(status: CreateTweetStatus.loading));
       // await LocalCache.filledQueue.clear();
@@ -73,6 +73,59 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
                 File(media.path!));
             media.url = "${supabase.storageUrl}/object/public/$url";
           }
+          mediaCount++;
+        }
+      }
+
+      final supaQueue = await supabase.from('queue').insert({
+        "tweets": state.tweets.map((e) => e.toJson()).toList(),
+        "scheduled_at": DateTime.now().toUtc().toString(),
+        "status": "pending",
+        "cron_text": 'RIGHT AWAY',
+      }).select('id');
+
+      final queueId = supaQueue.map((e) => e['id']).toList().first;
+      if (mediaCount != 0) {
+        await Api.updateMediaOnTweet(
+          queueId: queueId.toString(),
+          userId: LocalCache.currentUser
+              .get(AppConfig.hiveKeys.currenUserSupabaseId)
+              .toString(),
+        );
+      }
+
+      await Api.postTweet(
+        queueId: queueId.toString(),
+        userId: LocalCache.currentUser
+            .get(AppConfig.hiveKeys.currenUserSupabaseId)
+            .toString(),
+      );
+
+      emit(state.copyWith(
+          status: CreateTweetStatus.success, tweetStatus: 'success'));
+      emit(CreateTweetState.initial());
+      init();
+    } catch (e) {
+      print(e.toString());
+      emit(state.copyWith(status: CreateTweetStatus.error));
+    }
+  }
+
+  void onAddToQueue() async {
+    int mediaCount = 0;
+    try {
+      emit(state.copyWith(status: CreateTweetStatus.loading));
+      // await LocalCache.filledQueue.clear();
+      // await LocalCache.queue.clear();
+      for (var tweet in state.tweets) {
+        for (var media in tweet.media) {
+          if (media.path != null) {
+            final url = await supabase.storage.from('public').upload(
+                "${media.type}/${tweet.id}_${media.name.replaceAll(' ', '')}",
+                File(media.path!));
+            media.url = "${supabase.storageUrl}/object/public/$url";
+          }
+          mediaCount++;
         }
       }
 
@@ -81,32 +134,58 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         "scheduled_at": state.selected.toUtc().toString(),
         "status": "pending",
         "cron_text": dateTimeToCron(state.selected),
-        "cron_media":
-            dateTimeToCron(state.selected.subtract(const Duration(minutes: 10)))
       }).select('id');
 
       final queueId = supaQueue.map((e) => e['id']).toList().first;
 
-      await supabase.rpc('schedule_tweet_post', params: {
-        'name':
-            'queue-$queueId-${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}',
-        'expression': dateTimeToCron(state.selected),
-        'queue_id': queueId,
-        'user_id':
-            LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId),
-        'headers_input':
-            '{"Content-Type": "application/json", "Authorization": "Bearer ${LocalCache.currentUser.get(AppConfig.supabaseToken)}"}',
-        'url': AppConfig.postTweetUrl,
-        'body':
-            '{"queueId": $queueId, "userId": "${LocalCache.currentUser.get(AppConfig.hiveKeys.currenUserSupabaseId)}"}'
-      });
+      if (!DateTime.now()
+              .toUtc()
+              .add(const Duration(minutes: 5))
+              .isBefore(state.selected.toUtc()) &&
+          mediaCount != 0) {
+        await Api.scheduleTask(
+          name: 'media-$queueId',
+          expression: dateTimeToCron(
+              state.selected.subtract(const Duration(minutes: 5)).toUtc()),
+          url: AppConfig.updateMediaOnTweetUrl,
+          queueId: queueId.toString(),
+          userId: LocalCache.currentUser
+              .get(AppConfig.hiveKeys.currenUserSupabaseId)
+              .toString(),
+        );
+      }
+
+      if (!DateTime.now()
+              .toUtc()
+              .add(const Duration(minutes: 5))
+              .isAfter(state.selected.toUtc()) &&
+          mediaCount != 0) {
+        await Api.updateMediaOnTweet(
+          queueId: queueId.toString(),
+          userId: LocalCache.currentUser
+              .get(AppConfig.hiveKeys.currenUserSupabaseId)
+              .toString(),
+        );
+      }
+
+      await Api.scheduleTask(
+        name: 'post-$queueId',
+        expression: dateTimeToCron(state.selected.toUtc()),
+        url: AppConfig.postTweetUrl,
+        queueId: queueId.toString(),
+        userId: LocalCache.currentUser
+            .get(AppConfig.hiveKeys.currenUserSupabaseId)
+            .toString(),
+      );
 
       final id =
           removeLastFourZeros(state.selected.toUtc().millisecondsSinceEpoch);
+
       await LocalCache.filledQueue.put(id, id);
       await LocalCache.queue.put(id, id);
 
-      emit(state.copyWith(status: CreateTweetStatus.success));
+      emit(state.copyWith(
+          status: CreateTweetStatus.success, tweetStatus: 'success'));
       emit(CreateTweetState.initial());
       init();
     } catch (e) {
@@ -122,10 +201,12 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
       // await LocalCache.queue.clear();
       for (var tweet in state.tweets) {
         for (var media in tweet.media) {
-          final url = await supabase.storage.from('public').upload(
-              "${media.type}/${tweet.id}_${media.name}", File(media.path!));
-
-          media.url = "${supabase.storageUrl}/object/public/$url";
+          if (media.path != null) {
+            final url = await supabase.storage.from('public').upload(
+                "${media.type}/${tweet.id}_${media.name.replaceAll(' ', '')}",
+                File(media.path!));
+            media.url = "${supabase.storageUrl}/object/public/$url";
+          }
         }
       }
 
@@ -133,7 +214,8 @@ class CreateTweetCubit extends Cubit<CreateTweetState> {
         "tweets": state.tweets.map((e) => e.toJson()).toList(),
       });
 
-      emit(state.copyWith(status: CreateTweetStatus.success));
+      emit(state.copyWith(
+          status: CreateTweetStatus.success, tweetStatus: 'success'));
       emit(CreateTweetState.initial());
       init();
     } catch (e) {

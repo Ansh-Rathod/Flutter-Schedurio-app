@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:schedurio/helpers.dart';
-import 'package:schedurio/services/hive_cache.dart';
 
 import '../../widgets/heatmap/src/data/heatmap_color_mode.dart';
 import '../../widgets/heatmap/src/heatmap.dart';
@@ -170,10 +169,10 @@ class AnalyticScreenState extends State<AnalyticScreen> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      Text(
-                                          LocalCache.tweets.values.length
-                                              .toString(),
-                                          style: const TextStyle(
+                                      const Text("",
+                                          // LocalCache.tweets.values.length
+                                          //     .toString(),
+                                          style: TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold)),
                                     ],

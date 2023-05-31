@@ -10,7 +10,6 @@ class LocalCache {
   /// users box
   static late HiveContract currentUser;
   static late HiveContract twitterApi;
-  static late HiveContract tweets;
   static late HiveContract schedule;
   static late HiveContract filledQueue;
   static late HiveContract queue;
@@ -28,9 +27,7 @@ class LocalCache {
     twitterApi = HiveStorageImplementation(
       await Hive.openBox(AppConfig.hiveBoxNames.twitterApiConfig),
     );
-    tweets = HiveStorageImplementation(
-      await Hive.openBox(AppConfig.hiveBoxNames.tweets),
-    );
+
     schedule = HiveStorageImplementation(
       await Hive.openBox(AppConfig.hiveBoxNames.schedule),
     );

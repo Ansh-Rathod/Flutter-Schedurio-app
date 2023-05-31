@@ -24,7 +24,13 @@ class HistoryScreenCubit extends Cubit<HistoryScreenState> {
         final list = (e['tweets'] as List)
             .map((tweet) => QueueTweetModel.fromMap(tweet))
             .toList();
-        final map = {'id': e['id'], 'tweets': list, 'status': e['status']};
+        print(e['twitter_id']);
+        final map = {
+          'id': e['id'],
+          'twitter_id': e['twitter_id'],
+          'tweets': list,
+          'status': e['status']
+        };
         return map;
       }).toList();
       emit(state.copyWith(tweets: encoded, status: FetchTweetsStatus.loaded));

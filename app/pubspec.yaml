@@ -61,6 +61,8 @@ dependencies:
       url: https://github.com/google/flutter-desktop-embedding.git
       path: plugins/window_size
   uuid: ^3.0.7
+  postgresql2: ^1.0.4
+  postgres: ^2.6.1
 
 dev_dependencies:
   flutter_test:

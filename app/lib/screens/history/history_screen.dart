@@ -102,6 +102,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           (e) => HistoryTweetWidget(
                             tweets: e['tweets'],
                             id: e['id'],
+                            twitterId: e['twitter_id'].toString(),
                             status: e['status'],
                             onAddToQueue: (int id) {},
                             onDelete: (int id) async {

@@ -51,7 +51,60 @@ class _CreateTweetState extends State<CreateTweet> {
         children: [
           ContentArea(
             builder: (context, scrollController) =>
-                BlocBuilder<CreateTweetCubit, CreateTweetState>(
+                BlocConsumer<CreateTweetCubit, CreateTweetState>(
+              listener: (context, state) {
+                if (state.tweetStatus == 'success') {
+                  // ignore: use_build_context_synchronously
+                  showMacosAlertDialog(
+                    barrierDismissible: true,
+                    context: context,
+                    builder: (_) => MacosAlertDialog(
+                      appIcon: const FlutterLogo(
+                        size: 50,
+                      ),
+                      title: const Text(
+                        "Error!!",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600),
+                      ),
+                      message: const Text("Something went wrong"),
+                      primaryButton: PushButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        buttonSize: ButtonSize.large,
+                        child: const Text("OK"),
+                      ),
+                    ),
+                  );
+                }
+                if (state.tweetStatus == 'success') {
+                  showMacosAlertDialog(
+                    barrierDismissible: true,
+                    context: context,
+                    builder: (_) => MacosAlertDialog(
+                      appIcon: const Icon(
+                        CupertinoIcons.check_mark_circled_solid,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      title: const Text(
+                        "Done!!",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600),
+                      ),
+                      message: const Text(""),
+                      primaryButton: PushButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        buttonSize: ButtonSize.large,
+                        child: const Text("OK"),
+                      ),
+                    ),
+                  );
+                }
+              },
               builder: (context, state) {
                 return Container(
                   color: MacosTheme.of(context).canvasColor,
@@ -187,6 +240,11 @@ class _CreateTweetState extends State<CreateTweet> {
                                             )),
                                   CustomMacosPulldownButton(items: [
                                     CustomMacosPulldownMenuItem(
+                                      onTap: () {
+                                        BlocProvider.of<CreateTweetCubit>(
+                                                context)
+                                            .postNow();
+                                      },
                                       enabled: state.tweets.every((e) =>
                                           e.content != '' ||
                                           e.media.isNotEmpty),

@@ -8,6 +8,7 @@ class CreateTweetState {
   final List<QueueTweetModel> tweets;
   final List<DateTime> availableQueue;
   final DateTime selected;
+  final String tweetStatus;
   final List<DateTime> availableTimesForDay;
 
   CreateTweetState({
@@ -15,6 +16,7 @@ class CreateTweetState {
     required this.tweets,
     required this.availableQueue,
     required this.selected,
+    required this.tweetStatus,
     required this.availableTimesForDay,
   });
 
@@ -23,6 +25,7 @@ class CreateTweetState {
       availableQueue: [],
       status: CreateTweetStatus.initial,
       selected: DateTime.now(),
+      tweetStatus: 'initial',
       availableTimesForDay: [],
       tweets: [
         QueueTweetModel.inital(),
@@ -35,6 +38,7 @@ class CreateTweetState {
     List<QueueTweetModel>? tweets,
     List<DateTime>? availableQueue,
     DateTime? selected,
+    String? tweetStatus,
     List<DateTime>? availableTimesForDay,
   }) {
     return CreateTweetState(
@@ -42,6 +46,7 @@ class CreateTweetState {
       tweets: tweets ?? this.tweets,
       availableQueue: availableQueue ?? this.availableQueue,
       selected: selected ?? this.selected,
+      tweetStatus: tweetStatus ?? this.tweetStatus,
       availableTimesForDay: availableTimesForDay ?? this.availableTimesForDay,
     );
   }

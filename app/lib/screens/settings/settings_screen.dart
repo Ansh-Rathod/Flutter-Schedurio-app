@@ -6,6 +6,7 @@ import 'package:schedurio/services/hive_cache.dart';
 import 'package:schedurio/theme/cubit/theme_provider_cubit.dart';
 
 import '../../config.dart';
+import '../../main.dart';
 import '../posting_schedule/posting_schedule.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -245,54 +246,61 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           const MacosPulldownMenuDivider(),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Delete local cache",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                          "Delete all local cache will be clear your queue and tweets from the app you have to pull them again."
-                                              .toUpperCase(),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 10,
-                                            color: MacosTheme.brightnessOf(
-                                                        context) ==
-                                                    Brightness.dark
-                                                ? const Color(0xffa1a1a1)
-                                                : const Color(0xff6f6f6f),
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {},
-                                  // buttonSize: ButtonSize.large,
-                                  child: const Text("CLEAR",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                      )),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const MacosPulldownMenuDivider(),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(8.0),
+                          //   child: Row(
+                          //     children: [
+                          //       Expanded(
+                          //         child: Column(
+                          //           crossAxisAlignment:
+                          //               CrossAxisAlignment.start,
+                          //           children: [
+                          //             const Text(
+                          //               "Delete local cache",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w400,
+                          //                 fontSize: 16,
+                          //               ),
+                          //             ),
+                          //             const SizedBox(
+                          //               height: 3,
+                          //             ),
+                          //             Text(
+                          //                 "Delete all local cache will be clear your queue and tweets from the app you have to pull them again."
+                          //                     .toUpperCase(),
+                          //                 style: TextStyle(
+                          //                   fontWeight: FontWeight.w400,
+                          //                   fontSize: 10,
+                          //                   color: MacosTheme.brightnessOf(
+                          //                               context) ==
+                          //                           Brightness.dark
+                          //                       ? const Color(0xffa1a1a1)
+                          //                       : const Color(0xff6f6f6f),
+                          //                 )),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //       TextButton(
+                          //         onPressed: () async {
+                          //           await LocalCache.queue.clear();
+                          //           await LocalCache.filledQueue.clear();
+                          //           await LocalCache.schedule.clear();
+                          //           await LocalCache.currentUser.put(
+                          //               AppConfig.hiveKeys.walkThrough, null);
+                          //           await LocalCache.twitterApi.clear();
+                          //           await LocalCache.tweets.clear();
+                          //         },
+                          //         // buttonSize: ButtonSize.large,
+                          //         child: const Text("CLEAR",
+                          //             style: TextStyle(
+                          //               color: Colors.red,
+                          //               fontWeight: FontWeight.w400,
+                          //               fontSize: 14,
+                          //             )),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -300,7 +308,15 @@ class SettingsScreen extends StatelessWidget {
                               children: [
                                 PushButton(
                                   color: Colors.red,
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    await LocalCache.queue.clear();
+                                    await LocalCache.filledQueue.clear();
+                                    await LocalCache.schedule.clear();
+                                    await LocalCache.currentUser.put(
+                                        AppConfig.hiveKeys.walkThrough, null);
+                                    await LocalCache.twitterApi.clear();
+                                    SchedurioHome.restartApp(context);
+                                  },
                                   buttonSize: ButtonSize.large,
                                   child: const Text("Logout",
                                       style: TextStyle(

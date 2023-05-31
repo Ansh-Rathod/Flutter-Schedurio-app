@@ -2,10 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:schedurio/helpers.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import 'package:schedurio/helpers.dart';
+
+import '../config.dart';
 import '../models/queue_tweets.dart';
+import '../services/hive_cache.dart';
 import 'image_widget/_image_web.dart';
 
 class HistoryTweetWidget extends StatelessWidget {
@@ -16,6 +19,7 @@ class HistoryTweetWidget extends StatelessWidget {
   final String status;
   final Function(int id) onDelete;
   final Function(int id) onAddToQueue;
+  final String twitterId;
 
   const HistoryTweetWidget({
     Key? key,
@@ -26,6 +30,7 @@ class HistoryTweetWidget extends StatelessWidget {
     required this.status,
     required this.onDelete,
     required this.onAddToQueue,
+    required this.twitterId,
   }) : super(key: key);
 
   @override
@@ -74,8 +79,8 @@ class HistoryTweetWidget extends StatelessWidget {
                       if (status == 'posted')
                         TextButton(
                           onPressed: () {
-                            // launchUrlString(
-                            // 'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/');
+                            launchUrlString(
+                                'https://twitter.com/${LocalCache.currentUser.get(AppConfig.hiveKeys.username)}/status/${twitterId}');
                           },
                           child: const Text(
                             "View on Twitter",

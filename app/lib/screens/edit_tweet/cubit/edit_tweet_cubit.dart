@@ -96,6 +96,7 @@ class EditTweetCubit extends Cubit<EditTweetState> {
           }
         }
       }
+
       if (state.isDraft != null) {
         await supabase.from('drafts').update({
           "tweets": state.editedTweets.map((e) => e.toJson()).toList(),
