@@ -11,22 +11,24 @@ class AppConfig {
   static const String version = '1.0.1-beta';
 
   ///
-  static const String supabaseUrl = '';
+  static const String supabaseUrl = 'https://<id>.supabase.co';
 
-  static const String supabaseToken = "";
-
-// Post tweeet BackendUrL
-  static const String postTweetUrl = "<<Hosted server url>>";
+  static const String supabaseToken = "token";
+  static const String dbPassowrd = 'supabase postgres db password';
+  // Post tweeet BackendUrL
+  static const String postTweetUrl = " backend server url to post tweet";
+  static const String updateMediaOnTweetUrl =
+      "backend server url to update media tweet url";
 
   ///
   static const String gitHubRepoUrl =
-      'https://github.com/Ansh-Rathod/schedurio';
+      'https://github.com/Ansh-Rathod/Flutter-Schedurio-app';
   static const String myWebsite = 'https://anshrathod.com';
   static const String schedurioWeb = 'https://schedurio.anshrathod.com';
   static const String contributionUrl =
-      'https://github.com/Ansh-Rathod/schedurio/contribute.md';
+      'https://github.com/Ansh-Rathod/Flutter-Schedurio-app/contribute.md';
   static const String issuesUrl =
-      'https://github.com/Ansh-Rathod/schedurio/issues';
+      'https://github.com/Ansh-Rathod/Flutter-Schedurio-app/issues';
   static const String email = 'mailto:anshrathodfr@gmail.com';
   static const String github = 'https://github.com/Ansh-Rathod';
   static const String twitter = 'https://twitter.com/anshrathodfr';
